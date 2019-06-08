@@ -1,7 +1,8 @@
 package com.newweather.intelligenttravel.Gson;
 
+//train中result中的list
 public class list {
-    //极速数据中的数组数据
+
 
     public String type;//类型
     public String station;//起始站
