@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Intelligent-Travel-Recommendation-System-for-Passengers.iml" filepath="$PROJECT_DIR$/Intelligent-Travel-Recommendation-System-for-Passengers.iml" />
-      <module fileurl="file://$PROJECT_DIR$/IntelligentTravel.iml" filepath="$PROJECT_DIR$/IntelligentTravel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Intelligent2.iml" filepath="$PROJECT_DIR$/Intelligent2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
