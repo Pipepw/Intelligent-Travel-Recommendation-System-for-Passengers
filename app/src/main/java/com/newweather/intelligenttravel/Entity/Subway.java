@@ -13,4 +13,11 @@ public class Subway {
     @SerializedName("result")
     public List<Result1> ResultList;
 
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
 }
