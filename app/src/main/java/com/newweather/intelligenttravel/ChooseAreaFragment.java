@@ -3,6 +3,7 @@ package com.newweather.intelligenttravel;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static org.litepal.LitePalBase.TAG;
 
 
 public class ChooseAreaFragment extends Fragment {
@@ -63,11 +66,17 @@ public class ChooseAreaFragment extends Fragment {
         listView.setOnItemClickListener((parent, view, position, id) -> {
             if (currentLevel == LEVEL_PROVINCE) {
                 selectedProvince = provincesList.get(position);
-//                id和code都是同一个值，那么为什么要将其分成两个呢？，是因为他们的用处不同吧，
-//                id是在这一级用的，而code是用于下一级的，比如provinceId是在查询city的时候用的，
-//                而provinceCode是在city查询province的时候用的
                 cityList = LitePal.where("provinceId = ?",String.valueOf(
                         selectedProvince.getId())).find(City.class);
+                if(cityList.size() <= 0){
+                    int provinceCode = selectedProvince.getProvinceCode();
+                    String address = "http://guolin.tech/api/china/"+provinceCode;
+                    queryFromServer(address,"city");
+                    cityList = LitePal.where("provinceId = ?",String.valueOf(
+                            selectedProvince.getId())).find(City.class);
+                    Log.d(TAG, "onActivityCreated: kkk wow");
+                    Log.d(TAG, "onActivityCreated: kkk citylist  " + cityList.size());
+                }
                 if(cityList.size()==1){
                     Bundle bundle = ChooseAreaFragment.this.getArguments();
                     String status = null;
@@ -86,8 +95,7 @@ public class ChooseAreaFragment extends Fragment {
                     intent.putExtra("city", city);
                     ChooseAreaFragment.this.startActivity(intent);
                     ChooseAreaFragment.this.getActivity().onBackPressed();
-                }
-                else{
+                } else{
                     ChooseAreaFragment.this.queryCities();
                 }
             } else if (currentLevel == LEVEL_CITY) {
@@ -175,15 +183,12 @@ public class ChooseAreaFragment extends Fragment {
                     result = Utility.handleCityResponse(responseText,selectedProvince.getId());
                 }
                 if(result){
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            WaitDialog.dismiss();
-                            if ("province".equals(type)) {
-                                queryProvinces();
-                            } else if ("city".equals(type)) {
-                                queryCities();
-                            }
+                    getActivity().runOnUiThread(() -> {
+                        WaitDialog.dismiss();
+                        if ("province".equals(type)) {
+                            queryProvinces();
+                        } else if ("city".equals(type)) {
+                            queryCities();
                         }
                     });
                 }

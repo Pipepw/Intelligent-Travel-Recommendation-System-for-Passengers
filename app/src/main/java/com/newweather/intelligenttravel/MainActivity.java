@@ -17,6 +17,7 @@ import com.newweather.intelligenttravel.Entity.Subway;
 import com.newweather.intelligenttravel.Entity.Train;
 import com.newweather.intelligenttravel.Gson.list;
 import com.newweather.intelligenttravel.util.HttpUtil;
+import com.newweather.intelligenttravel.util.SiteUtil;
 import com.newweather.intelligenttravel.util.TimePickerDialogUtil;
 
 import java.io.IOException;
@@ -35,8 +36,11 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
     private Button ScButton;
     private Button EcButton;
     private Button TimeButton;
+    private Button QueryButton;
     private TextView ScText;
     private TextView EcText;
+    private TextView TimeText;
+    private TextView DateText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +48,12 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
         setContentView(R.layout.activity_main);
         ScButton = findViewById(R.id.start_city_button);
         EcButton = findViewById(R.id.end_city_button);
+        QueryButton = findViewById(R.id.query_button);
         TimeButton = findViewById(R.id.choose_time_button);
         ScText = findViewById(R.id.start_city_text);
         EcText = findViewById(R.id.end_city_text);
+        TimeText = findViewById(R.id.time_text);
+        DateText = findViewById(R.id.date_text);
         int flag = getIntent().getIntExtra("status",2);
         String sCity, eCity;
         SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
@@ -68,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
             eCity = pref.getString("EcCity","");
             EcText.setText(eCity);
         }
+        DateText.setText(pref.getString("date",""));
+        TimeText.setText(pref.getString("time",""));
         ScButton.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putString("data", "Start");
@@ -90,6 +99,14 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
             transaction.commit();
         });
         TimeButton.setOnClickListener(v -> mTimePickerDialog.showDateAndTimePickerDialog());
+
+        QueryButton.setOnClickListener(v->{
+            String StartCity = pref.getString("ScCity","");
+            String EndCity = pref.getString("EcCity","");
+            String Date = pref.getString("date","");   //格式为：xxxx-xx-xx  如：2019-01-23
+            String Time = pref.getString("time","");   //格式为: xx;xx     如：04:45
+            SiteUtil.requestLaL("上海");
+        });
     }
 
 
@@ -97,18 +114,16 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
     public void positiveListener() {
 
         SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
-        TextView TimeText = findViewById(R.id.time_text);
-        TextView Datetext = findViewById(R.id.date_text);
+        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
         Format f = new DecimalFormat("00");
         String date = mTimePickerDialog.getYear() + "-" + f.format(mTimePickerDialog.getMonth()) +
                 "-" + f.format(mTimePickerDialog.getDay());
         String time = f.format(mTimePickerDialog.getHour()) + ":" + f.format(mTimePickerDialog.getMinute());
-        Datetext.setText(date);
-        Log.d(TAG, "onCreate: kkk date = " + date);
-        TimeText.setText(time);
         editor.putString("date",date);
         editor.putString("time",time);
         editor.apply();
+        DateText.setText(pref.getString("date",""));
+        TimeText.setText(pref.getString("time",""));
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.newweather.intelligenttravel.Entity.Subway;
 import com.newweather.intelligenttravel.Entity.Train;
+import com.newweather.intelligenttravel.Gson.LngAndLat;
 import com.newweather.intelligenttravel.db.City;
 import com.newweather.intelligenttravel.db.Province;
 
@@ -15,7 +16,6 @@ import org.json.JSONObject;
 
 /**
  * 保存返回的数据
- * 计算时间，获取附近地铁位置
  */
 public class Utility {
     public static Train handleTrainResponse(String response){
@@ -87,5 +87,26 @@ public class Utility {
         }
         return false;
     }
+
+    /**
+     * 解析经纬度api
+     */
+    public static LngAndLat handleLngALat(String response){
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            String LaLContent=jsonObject.toString();
+            //Log.d("ac",trainContent);
+            return new Gson().fromJson(LaLContent, LngAndLat.class);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 解析高德api获取途径站点
+     */
+
 
 }

@@ -3,6 +3,7 @@ package com.newweather.intelligenttravel.Entity;
 public class Flight {
     private String StartTime;
     private String EndTime;
+    private String UseTime;
     private String StartStation;
     private String EndStation;
     private String Fare;
@@ -45,5 +46,12 @@ public class Flight {
 
     public void setFare(String fare) {
         Fare = fare;
+    }
+
+    public String getUseTime(){
+        return UseTime;
+    }
+    public void setUseTime(String useTime){
+
     }
 }
