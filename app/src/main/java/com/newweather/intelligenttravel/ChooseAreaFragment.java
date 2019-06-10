@@ -66,7 +66,30 @@ public class ChooseAreaFragment extends Fragment {
 //                id和code都是同一个值，那么为什么要将其分成两个呢？，是因为他们的用处不同吧，
 //                id是在这一级用的，而code是用于下一级的，比如provinceId是在查询city的时候用的，
 //                而provinceCode是在city查询province的时候用的
-                ChooseAreaFragment.this.queryCities();
+                cityList = LitePal.where("provinceId = ?",String.valueOf(
+                        selectedProvince.getId())).find(City.class);
+                if(cityList.size()==1){
+                    Bundle bundle = ChooseAreaFragment.this.getArguments();
+                    String status = null;
+                    if (bundle != null) {
+                        status = bundle.getString("data");
+                    }
+                    String city = selectedProvince.getProvinceName();
+                    Toast.makeText(ChooseAreaFragment.this.getActivity(), "You clicked a city", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent();
+                    intent.setClass(ChooseAreaFragment.this.getActivity(), MainActivity.class);
+                    if (status.equals("Start")) {
+                        intent.putExtra("status", 0);
+                    } else if (status.equals("End")) {
+                        intent.putExtra("status", 1);
+                    }
+                    intent.putExtra("city", city);
+                    ChooseAreaFragment.this.startActivity(intent);
+                    ChooseAreaFragment.this.getActivity().onBackPressed();
+                }
+                else{
+                    ChooseAreaFragment.this.queryCities();
+                }
             } else if (currentLevel == LEVEL_CITY) {
                 Bundle bundle = ChooseAreaFragment.this.getArguments();
                 String status = null;
