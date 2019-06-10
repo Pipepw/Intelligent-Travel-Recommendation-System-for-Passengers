@@ -1,0 +1,8 @@
+<litepal>
+    <dbname value = "intelligent"/>
+    <version value = "1"/>
+    <list>
+        <mapping class="com.newweather.intelligenttravel.db.Province"/>
+        <mapping class="com.newweather.intelligenttravel.db.City"/>
+    </list>
+</litepal>

@@ -1,10 +1,22 @@
 package com.newweather.intelligenttravel;
 
 import android.content.SharedPreferences;
+<<<<<<< HEAD
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+=======
+import android.os.Build;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+>>>>>>> 1182126499d92429bb3c22fc778dbb5533f93f6a
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,21 +24,111 @@ import com.newweather.intelligenttravel.Entity.Subway;
 import com.newweather.intelligenttravel.Entity.Train;
 import com.newweather.intelligenttravel.Gson.list;
 import com.newweather.intelligenttravel.util.HttpUtil;
+<<<<<<< HEAD
 import com.newweather.intelligenttravel.util.Utility;
+=======
+import com.newweather.intelligenttravel.util.TimePickerDialogUtil;
+>>>>>>> 1182126499d92429bb3c22fc778dbb5533f93f6a
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.util.Objects;
 
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TimePickerDialogUtil.TimePickerDialogInterface {
+
+    private static final String TAG = "MainActivity";
+    TimePickerDialogUtil mTimePickerDialog = new TimePickerDialogUtil(MainActivity.this);
+
+    private Button ScButton;
+    private Button EcButton;
+    private Button TimeButton;
+    private TextView ScText;
+    private TextView EcText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ScButton = findViewById(R.id.start_city_button);
+        EcButton = findViewById(R.id.end_city_button);
+        TimeButton = findViewById(R.id.choose_time_button);
+        ScText = findViewById(R.id.start_city_text);
+        EcText = findViewById(R.id.end_city_text);
+        int flag = getIntent().getIntExtra("status",2);
+        String sCity, eCity;
+        SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
+        SharedPreferences pref = getSharedPreferences("data",MODE_PRIVATE);
+        String city = getIntent().getStringExtra("city");
 
-        getTrain("杭州","西安" ,"2019-12-12");
+        if(flag==1){
+            editor.putString("EcCity",city);
+            editor.apply();
+        }else if(flag==0) {
+            editor.putString("ScCity",city);
+            editor.apply();
+        }
+        if(!pref.getString("ScCity", "").equals("")){
+            sCity = pref.getString("ScCity", "");
+            ScText.setText(sCity);
+        }
+        if(!pref.getString("EcCity", "").equals("")){
+            eCity = pref.getString("EcCity","");
+            EcText.setText(eCity);
+        }
+        ScButton.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("data", "Start");
+            Fragment fragment = new ChooseAreaFragment();
+            fragment.setArguments(bundle);
+            FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.add(R.id.area_fragment, fragment);
+            transaction.commit();
+        });
+
+        EcButton.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("data", "End");
+            Fragment fragment = new ChooseAreaFragment();
+            fragment.setArguments(bundle);
+            FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.add(R.id.area_fragment, fragment);
+            transaction.commit();
+        });
+        TimeButton.setOnClickListener(v -> mTimePickerDialog.showDateAndTimePickerDialog());
+    }
+
+
+    @Override
+    public void positiveListener() {
+
+        SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit();
+        TextView TimeText = findViewById(R.id.time_text);
+        TextView Datetext = findViewById(R.id.date_text);
+        Format f = new DecimalFormat("00");
+        String date = mTimePickerDialog.getYear() + "-" + f.format(mTimePickerDialog.getMonth()) +
+                "-" + f.format(mTimePickerDialog.getDay());
+        String time = f.format(mTimePickerDialog.getHour()) + ":" + f.format(mTimePickerDialog.getMinute());
+        Datetext.setText(date);
+        Log.d(TAG, "onCreate: kkk date = " + date);
+        TimeText.setText(time);
+        editor.putString("date",date);
+        editor.putString("time",time);
+        editor.apply();
+    }
+
+    @Override
+    public void negativeListener() {
+
+    }
+
+    //获取Train
+       // getTrain("杭州","西安" ,"2019-12-12");
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         String trainString=prefs.getString("train",null);
         Train train= Utility.handleTrainResponse(trainString);
@@ -39,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
 //        statusText.setText(status);
 //        startText.setText(start);
 //        endText.setText(end);
+            //获取train中list包括起始站，终点站类型，时间
 //        for(list mlist :train.getResult().getListList()){
 //            departuretimeText.setText(mlist.getDeparturetime());
 //            arrivaltimeText.setText(mlist.getArrivaltime());
@@ -47,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 //            costtimeText.setText(mlist.getCosttime());
 //            typenameText.setText(mlist.getTypename());
 //        }
-    }
+
     public void getTrain(String startcity,String endcity,String date){
         String trainUrl="https://api.jisuapi.com/train/station2s?appkey=e74dd71c6e53e1c1&start="+startcity+"&end="+endcity+"&date="+date;
         HttpUtil.sendOkHttpRequest(trainUrl, new Callback() {
@@ -219,4 +322,6 @@ public class MainActivity extends AppCompatActivity {
 //            totaldurationText.setText(mresult.totalduration);
 //        }
 //    }
+
+
 }

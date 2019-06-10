@@ -8,8 +8,8 @@ import java.util.List;
 public class Result {
 
     //极速数据中的result
-    private  String start;
-    private  String end;
+    private  String start;//起始城市
+    private  String end;//结束城市
     private  String ishigh;
 
     @SerializedName("list")
