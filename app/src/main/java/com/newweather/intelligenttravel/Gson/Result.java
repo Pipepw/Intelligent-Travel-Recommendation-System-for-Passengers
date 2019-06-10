@@ -8,10 +8,34 @@ import java.util.List;
 public class Result {
 
     //极速数据中的result
-    public String start;
-    public String end;
-    public String ishigh;
+    private  String start;
+    private  String end;
+    private  String ishigh;
 
     @SerializedName("list")
     public List<list> listList;
+
+    public void setStart(String start) {
+        this.start = start;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public void setEnd(String end) {
+        this.end = end;
+    }
+
+    public String getEnd() {
+        return end;
+    }
+
+    public void setListList(List<list> listList) {
+        this.listList = listList;
+    }
+
+    public List<list> getListList() {
+        return listList;
+    }
 }
