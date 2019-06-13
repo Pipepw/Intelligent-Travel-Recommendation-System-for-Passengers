@@ -10,8 +10,31 @@ public class Result1 {
     public String tiptype;//方案类型
     public String arrivetime;//到达时间
 
+    public void setTotalprice(String totalprice) {
+        this.totalprice = totalprice;
+    }
 
-// 解析出现错误
+    public String getTotalprice() {
+        return totalprice;
+    }
+
+    public void setTotalduration(String totalduration) {
+        this.totalduration = totalduration;
+    }
+
+    public String getTotalduration() {
+        return totalduration;
+    }
+
+    public void setTotaldistance(String totaldistance) {
+        this.totaldistance = totaldistance;
+    }
+
+    public String getTotaldistance() {
+        return totaldistance;
+    }
+
+    // 解析出现错误
 //    @SerializedName("vehicles")
 //    public List<String>VehiclesList;//换乘车列表
 //
