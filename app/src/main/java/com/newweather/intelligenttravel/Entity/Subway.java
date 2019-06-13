@@ -20,4 +20,12 @@ public class Subway {
     public String getMsg() {
         return msg;
     }
+
+    public void setResultList(List<Result1> resultList) {
+        ResultList = resultList;
+    }
+
+    public List<Result1> getResultList() {
+        return ResultList;
+    }
 }
