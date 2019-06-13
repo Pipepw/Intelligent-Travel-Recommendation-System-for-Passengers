@@ -3,10 +3,11 @@ package com.newweather.intelligenttravel.Entity;
 public class Flight {
     private String StartTime;
     private String EndTime;
-    private String UseTime;
     private String StartStation;
     private String EndStation;
     private String Fare;
+    private int order_flag;
+    private int choose_flag;
 
     public String getStartTime() {
         return StartTime;
@@ -48,10 +49,19 @@ public class Flight {
         Fare = fare;
     }
 
-    public String getUseTime(){
-        return UseTime;
+    public int getOrder_flag() {
+        return order_flag;
     }
-    public void setUseTime(String useTime){
 
+    public void setOrder_flag(int order_flag) {
+        this.order_flag = order_flag;
+    }
+
+    public int getChoose_flag() {
+        return choose_flag;
+    }
+
+    public void setChoose_flag(int choose_flag) {
+        this.choose_flag = choose_flag;
     }
 }

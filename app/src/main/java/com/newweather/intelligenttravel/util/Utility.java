@@ -1,6 +1,7 @@
 package com.newweather.intelligenttravel.util;
 
 
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -87,26 +88,5 @@ public class Utility {
         }
         return false;
     }
-
-    /**
-     * 解析经纬度api
-     */
-    public static LngAndLat handleLngALat(String response){
-        try {
-            JSONObject jsonObject=new JSONObject(response);
-            String LaLContent=jsonObject.toString();
-            //Log.d("ac",trainContent);
-            return new Gson().fromJson(LaLContent, LngAndLat.class);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * 解析高德api获取途径站点
-     */
-
 
 }

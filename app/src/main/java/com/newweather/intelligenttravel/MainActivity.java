@@ -1,43 +1,32 @@
 package com.newweather.intelligenttravel;
 
 import android.content.SharedPreferences;
-<<<<<<< HEAD
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-=======
-import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
->>>>>>> 1182126499d92429bb3c22fc778dbb5533f93f6a
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.newweather.intelligenttravel.Entity.Subway;
 import com.newweather.intelligenttravel.Entity.Train;
 import com.newweather.intelligenttravel.Gson.list;
+import com.newweather.intelligenttravel.db.City;
+import com.newweather.intelligenttravel.db.Province;
 import com.newweather.intelligenttravel.util.HttpUtil;
-<<<<<<< HEAD
-import com.newweather.intelligenttravel.util.SiteUtil;
-=======
-<<<<<<< HEAD
 import com.newweather.intelligenttravel.util.Utility;
-=======
->>>>>>> a36410d1c6909a868670cfc42105a684f5708728
 import com.newweather.intelligenttravel.util.TimePickerDialogUtil;
->>>>>>> 1182126499d92429bb3c22fc778dbb5533f93f6a
+
+import org.litepal.LitePal;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.Format;
-import java.util.Objects;
+import java.util.List;
 
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -100,6 +89,15 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.add(R.id.area_fragment, fragment);
             transaction.commit();
+            List<Province> provinceList = LitePal.findAll(Province.class);
+            List<City> cityList;
+            for(Province province : provinceList){
+                cityList = LitePal.where("provinceId=?",String.valueOf(
+                        province.getId())).find(City.class);
+                for(City City : cityList){
+                    Log.d(TAG, "onCreate: kkk city = " + City.getCityName());
+                }
+            }
         });
 
         EcButton.setOnClickListener(v -> {
@@ -119,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
             String EndCity = pref.getString("EcCity","");
             String Date = pref.getString("date","");   //格式为：xxxx-xx-xx  如：2019-01-23
             String Time = pref.getString("time","");   //格式为: xx;xx     如：04:45
-            pSiteUtil.requestLaL("上海");
+
         });
     }
 
@@ -147,9 +145,9 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 
     //获取Train
        // getTrain("杭州","西安" ,"2019-12-12");
-        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
-        String trainString=prefs.getString("train",null);
-        Train train= Utility.handleTrainResponse(trainString);
+//        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+//        String trainString=prefs.getString("train",null);
+//        Train train= Utility.handleTrainResponse(trainString);
         //使用train示例
 //        String  msg=train.getMsg();
 //        String status=train.getStatus();

@@ -31,7 +31,7 @@ import okhttp3.Response;
 
 import static org.litepal.LitePalBase.TAG;
 
-
+//定义一个全局的变量，然后通过get和set的方法来获取
 public class ChooseAreaFragment extends Fragment {
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
@@ -71,11 +71,9 @@ public class ChooseAreaFragment extends Fragment {
                 if(cityList.size() <= 0){
                     int provinceCode = selectedProvince.getProvinceCode();
                     String address = "http://guolin.tech/api/china/"+provinceCode;
-                    queryFromServer(address,"city");
+                    queryFromServer(address,"city",selectedProvince);
                     cityList = LitePal.where("provinceId = ?",String.valueOf(
                             selectedProvince.getId())).find(City.class);
-                    Log.d(TAG, "onActivityCreated: kkk wow");
-                    Log.d(TAG, "onActivityCreated: kkk citylist  " + cityList.size());
                 }
                 if(cityList.size()==1){
                     Bundle bundle = ChooseAreaFragment.this.getArguments();
@@ -134,13 +132,23 @@ public class ChooseAreaFragment extends Fragment {
             dataList.clear();
             for(Province province : provincesList){
                 dataList.add(province.getProvinceName());
+//                将所有的城市都先获取下来，要不要考虑使用多线程（Okhttp本身就已经用了线程池的）
+                cityList = LitePal.where("provinceId = ?",String.valueOf(
+                        province.getId())).find(City.class);
+                if(cityList.size() <= 0){
+                    int provinceCode = province.getProvinceCode();
+                    String address = "http://guolin.tech/api/china/"+provinceCode;
+                    queryFromServer(address,"city_p",province);
+                    cityList = LitePal.where("provinceId = ?",String.valueOf(
+                            province.getId())).find(City.class);
+                }
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
         }else{
             String address = "http://guolin.tech/api/china";
-            queryFromServer(address,"province");
+            queryFromServer(address,"province",selectedProvince);
         }
     }
     private void queryCities(){
@@ -160,18 +168,17 @@ public class ChooseAreaFragment extends Fragment {
             int provinceCode = selectedProvince.getProvinceCode();
 
             String address = "http://guolin.tech/api/china/"+provinceCode;
-            queryFromServer(address,"city");
+            queryFromServer(address,"city_c",selectedProvince);
         }
     }
 
     //为了从服务器中获取数据
-    private void queryFromServer(String address, final String type){
+    private void queryFromServer(String address, final String type, Province province){
         WaitDialog.showProgressDialog(getActivity());
 
 //        Callback是用来回调的
         HttpUtil.sendOkHttpRequest(address, new Callback() {
             //            回调获得服务器中的数据，new Callback()只是声明了一个接口对象，对接口方法的实现在下面
-//            为什么不能进入回调中
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 
@@ -179,15 +186,15 @@ public class ChooseAreaFragment extends Fragment {
                 boolean result = false;
                 if("province".equals(type)){
                     result = Utility.handleProvinceResponse(responseText);
-                }else if("city".equals(type)){
-                    result = Utility.handleCityResponse(responseText,selectedProvince.getId());
+                }else if("city_c".equals(type)||"city_p".equals(type)){
+                    result = Utility.handleCityResponse(responseText,province.getId());
                 }
                 if(result){
                     getActivity().runOnUiThread(() -> {
                         WaitDialog.dismiss();
                         if ("province".equals(type)) {
                             queryProvinces();
-                        } else if ("city".equals(type)) {
+                        } else if ("city_c".equals(type)) {
                             queryCities();
                         }
                     });
