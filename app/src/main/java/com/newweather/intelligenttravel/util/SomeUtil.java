@@ -15,8 +15,10 @@ import okhttp3.Response;
 import static android.content.ContentValues.TAG;
 
 public class SomeUtil {
-    private static String Lng;
-    private static String Lat;
+    private static String startLng;
+    private static String startLat;
+    private static String endLng;
+    private static String endLat;
     /**
      * 获取时间的结果,如果时间小于的话，则返回"false"，否则返回花费的时间（String型）
      * 所以判断时间大小的时候，就看结果是不是“false”,如果前小于后，则返回false
@@ -43,44 +45,91 @@ public class SomeUtil {
 
     /**
      * 获取城市的经纬度
-     * @param City
+     * @param startCity
      */
-    public static void GetLaL(Handler LaLHandler, final String City){
-        String lalUrl = "https://apis.map.qq.com/ws/geocoder/v1/?address="+City+"&key=3BYBZ-U6DKI-L5WGH-5EQXL-PJCBZ-LQFMK";
-        HttpUtil.sendOkHttpRequest(lalUrl, new Callback() {
+    public static void GetLaL(Handler LaLHandler, final String startCity, final String endCity){
+        String startLaL = "https://apis.map.qq.com/ws/geocoder/v1/?address="+startCity+"&key=3BYBZ-U6DKI-L5WGH-5EQXL-PJCBZ-LQFMK";
+        String endLaL = "https://apis.map.qq.com/ws/geocoder/v1/?address="+endCity+"&key=3BYBZ-U6DKI-L5WGH-5EQXL-PJCBZ-LQFMK";
+        HttpUtil.sendOkHttpRequest(startLaL, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d(TAG, "onFailure: kkk have it failed?");
+                Log.e(TAG, "onFailure: get startLaL failed");
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.d(TAG, "onResponse: kkk have it ? ? ?");
                 final String responseText = response.body().string();
                 final LngAndLat lngAndLat = Utility.handleLngALat(responseText);
 //                Lng为经度，Lat为维度
-                Lng = lngAndLat.result.location.lng;
-                Lat = lngAndLat.result.location.lat;
+                startLng = lngAndLat.result.location.lng;
+                startLat = lngAndLat.result.location.lat;
                 Message msg = new Message();
                 msg.what = 1;
                 LaLHandler.sendMessage(msg);
             }
         });
+        HttpUtil.sendOkHttpRequest(endLaL, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure: get endLaL failed");
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responseText = response.body().string();
+                final LngAndLat lngAndLat = Utility.handleLngALat(responseText);
+//                Lng为经度，Lat为维度
+                endLng = lngAndLat.result.location.lng;
+                endLat = lngAndLat.result.location.lat;
+                Message msg = new Message();
+                msg.what = 2;
+                LaLHandler.sendMessage(msg);
+            }
+        });
     }
 
-    public static String getLng() {
-        return Lng;
+    /**
+     * 将字符串转换为时间
+     * @param time_str
+     * @return
+     */
+    public static String TransToTime(String time_str){
+        String str_hour = time_str.substring(0,2);
+        String str_mine = time_str.substring(2,4);
+        Log.d(TAG, "TransToTime: kkk hour = " + str_hour);
+        Log.d(TAG, "TransToTime: kkk mine = " + str_mine);
+        String time = str_hour + ":"+str_mine;
+        Log.d(TAG, "TransToTime: kkk time = " + time);
+        return time;
     }
 
-    public static void setLng(String lng) {
-        Lng = lng;
+    public static String getStartLng() {
+        return startLng;
     }
 
-    public static String getLat() {
-        return Lat;
+    public static void setStartLng(String startLng) {
+        SomeUtil.startLng = startLng;
     }
 
-    public static void setLat(String lat) {
-        Lat = lat;
+    public static String getStartLat() {
+        return startLat;
+    }
+
+    public static void setStartLat(String startLat) {
+        SomeUtil.startLat = startLat;
+    }
+
+    public static String getEndLng() {
+        return endLng;
+    }
+
+    public static void setEndLng(String endLng) {
+        SomeUtil.endLng = endLng;
+    }
+
+    public static String getEndLat() {
+        return endLat;
+    }
+
+    public static void setEndLat(String endLat) {
+        SomeUtil.endLat = endLat;
     }
 }

@@ -1,10 +1,12 @@
 package com.newweather.intelligenttravel.util;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.newweather.intelligenttravel.Entity.Subway;
@@ -25,6 +27,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static org.litepal.LitePalBase.TAG;
+
 /**
  * 获取火车的相关数据
  */
@@ -33,38 +37,66 @@ public class AnotherGet {
     private static TrueTrain trueTrain=new TrueTrain();
     private static Subway subway;
     private static TrueSubway trueSubway=new TrueSubway();
+    private static String startLng = "";
+    private static String startLat = "";
+    private static String endLng = "";
+    private static String endLat = "";
     public static void getTrain(final Handler myHandler, String startcity, String endcity, String date, final String time){
-        String trainUrl="https://api.jisuapi.com/train/station2s?appkey=e74dd71c6e53e1c1&start="+startcity+"&end="+endcity+"&date="+date;
-        HttpUtil.sendOkHttpRequest(trainUrl, new Callback() {
+        @SuppressLint("HandlerLeak") Handler GetHanlder = new Handler(){
             @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                e.printStackTrace();
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String responseText=response.body().string();
-                train= Utility.handleTrainResponse(responseText);
-                Bundle bundle=new Bundle();
-                for(list List:train.getResult().listList){
-                    if(compare_date(List.getDeparturetime(),time)>0) {
-                        trueTrain.setDeparturetime(List.getDeparturetime());
-                        trueTrain.setArrivaltime(List.getArrivaltime());
-                        trueTrain.setStation(List.getStation());
-                        trueTrain.setEndstation(List.getEndstation());
-                        trueTrain.setCosttime(List.getCosttime());
-                        trueTrain.setTypename(List.getTypename());
-                        trueTrain.setPriceyd(List.getPriceyd());
-                        trueTrain.setPriceed(List.getPriceed());
-                        Message msg = new Message();
-                        msg.what = 1;
-                        msg.setData(bundle);
-                        myHandler.sendMessage(msg);
-                        break;
+            public void handleMessage(Message msg) {
+
+                super.handleMessage(msg);
+                if(msg.what==1){
+                    startLng = SomeUtil.getStartLng();
+                    startLat = SomeUtil.getStartLat();
+                }
+                if(msg.what==2){
+                    endLng = SomeUtil.getEndLng();
+                    endLat = SomeUtil.getEndLat();
+                }
+//                出发城市以及目标城市的经纬度都获取了之后才开始后面的任务
+                if(!(startLng.equals(""))&&!(endLng.equals(""))){
+                    String trainUrl="https://restapi.amap.com/v3/direction/transit/integrated?key=0207fc16251cf7d3487948f8949cf2b7" +
+                            "&origin="+ startLng +","+startLat+"&destination="+endLng+","+endLat+"&city="+startcity+"&cityd="+endcity+"&strategy=0" +
+                            "&date="+date+"&time="+time;
+                    HttpUtil.sendOkHttpRequest(trainUrl, new okhttp3.Callback() {
+                    @Override
+                    public void onFailure(okhttp3.Call call, IOException e) {
+                        e.printStackTrace();
                     }
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        final String responseText=response.body().string();
+                        train= Utility.handleTrainResponse(responseText);
+                        Bundle bundle=new Bundle();
+                        for(list List:train.getResult().listList){
+                            if(compare_date(List.getDeparturetime(),time)>0) {
+                                trueTrain.setDeparturetime(List.getDeparturetime());
+                                trueTrain.setArrivaltime(List.getArrivaltime());
+                                trueTrain.setStation(List.getStation());
+                                trueTrain.setEndstation(List.getEndstation());
+                                trueTrain.setCosttime(List.getCosttime());
+                                trueTrain.setTypename(List.getTypename());
+                                trueTrain.setPriceyd(List.getPriceyd());
+                                trueTrain.setPriceed(List.getPriceed());
+                                Message msg = new Message();
+                                msg.what = 1;
+                                msg.setData(bundle);
+                                myHandler.sendMessage(msg);
+                                break;
+                            }
+                        }
+                    }
+                });
                 }
             }
-        });
+        };
+//        获取经纬度
+        SomeUtil.GetLaL(GetHanlder,startcity,endcity);
     }
+
+//    获取地铁
     public static void getSubway(Handler myHandler,String city,String endcity,String start,String end){
         String subwayUrl = " https://api.jisuapi.com/transit/station2s?city="+city+"&endcity="+endcity+"&start="+start+"&end="+end+"&appkey=e74dd71c6e53e1c1";
         HttpUtil.sendOkHttpRequest(subwayUrl, new Callback() {

@@ -16,11 +16,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.newweather.intelligenttravel.Entity.Flight;
 import com.newweather.intelligenttravel.Entity.TrueSubway;
 import com.newweather.intelligenttravel.Entity.TrueTrain;
-import com.newweather.intelligenttravel.util.FlightUtil;
-import com.newweather.intelligenttravel.util.PlanUtil;
 import com.newweather.intelligenttravel.util.SomeUtil;
 import com.newweather.intelligenttravel.util.TimePickerDialogUtil;
 
@@ -126,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 //                        Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getOrder_flag());
 //                        Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().getChoose_flag());
 //                        Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().getOrder_flag());
-                        Log.d(TAG, "handleMessage: kkk get it ? " + SomeUtil.getLat());
+                        Log.d(TAG, "handleMessage: kkk get it ? " + SomeUtil.getStartLat());
                         WaitDialog.dismiss();
                     } else if (msg.what == 2) {
                         super.handleMessage(msg);
@@ -137,9 +134,10 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
                 }
             };
             //planUtil.GetPlan(myHandler,StartCity,EndCity,Date,Time);
-            SomeUtil.GetLaL(myHandler,"乐山");
+            //SomeUtil.GetLaL(myHandler,"乐山");
+            //Log.d(TAG, "onCreate: kkk get it? + " + SomeUtil.TransToTime("0912"));
             //参数实例
-//            AnotherGet.getTrain(myHandler, "杭州", "北京", "2019-6-13", "8:00");
+            AnotherGet.getTrain(myHandler, "杭州", "北京", "2019-6-13", "8:00");
 //            AnotherGet.getSubway(myHandler, "杭州", "杭州", "西溪竞舟苑", "杭州汽车北站");
         });
     }
