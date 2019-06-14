@@ -25,6 +25,9 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+/**
+ * 获取火车的相关数据
+ */
 public class AnotherGet {
     private static Train train;
     private static TrueTrain trueTrain=new TrueTrain();
@@ -105,7 +108,7 @@ public class AnotherGet {
         }
         return 0;
     }
-    public static TrueTrain gettraim(){
+    public static TrueTrain gettrain(){
         return trueTrain;
     }
     public static TrueSubway getsubwayy(){

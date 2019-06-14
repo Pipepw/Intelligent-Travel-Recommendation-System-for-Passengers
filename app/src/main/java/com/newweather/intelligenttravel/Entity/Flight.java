@@ -6,8 +6,8 @@ public class Flight {
     private String StartStation;
     private String EndStation;
     private String Fare;
-    private int order_flag;
-    private int choose_flag;
+    private int order_flag;//1表示先，2表示后
+    private int choose_flag;//0表示无，1表示有
 
     public String getStartTime() {
         return StartTime;

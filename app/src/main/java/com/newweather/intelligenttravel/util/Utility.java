@@ -3,6 +3,7 @@ package com.newweather.intelligenttravel.util;
 
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.newweather.intelligenttravel.Entity.Subway;
@@ -87,6 +88,22 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    /**
+     * 解析经纬度api
+     */
+    public static LngAndLat handleLngALat(String response){
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            String LaLContent=jsonObject.toString();
+
+            return new Gson().fromJson(LaLContent, LngAndLat.class);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
