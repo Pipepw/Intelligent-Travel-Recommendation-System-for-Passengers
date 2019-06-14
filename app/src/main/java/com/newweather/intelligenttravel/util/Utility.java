@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.newweather.intelligenttravel.Entity.Segments;
 import com.newweather.intelligenttravel.Entity.Subway;
 import com.newweather.intelligenttravel.Entity.Train;
 import com.newweather.intelligenttravel.Gson.LngAndLat;
@@ -15,6 +17,9 @@ import com.newweather.intelligenttravel.db.Province;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * 保存返回的数据
@@ -48,6 +53,27 @@ public class Utility {
         }
         return null;
     }
+
+    //解析trainroute数据
+    public static List<Segments> handleTrainRouteResponse(String response){
+        try{
+            JSONObject jsonObject=new JSONObject(response);
+            JSONObject jsonObject1=jsonObject.getJSONObject("route");
+            JSONArray jsonArray=jsonObject1.getJSONArray("transits");
+            JSONObject jsonObject2=jsonArray.getJSONObject(0);
+            JSONArray jsonArray1=jsonObject2.getJSONArray("segments");
+            String trainRouteContent1=jsonArray1.toString();
+            Gson gson=new Gson();
+            Type type=new TypeToken<List<Segments>>(){}.getType();
+            List<Segments> list=gson.fromJson(trainRouteContent1,type);
+            return list;
+            //return new Gson().fromJson(trainRouteContent1, Segments.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     /**
      * 获取省份和城市
