@@ -21,10 +21,14 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * 保存返回的数据
  */
 public class Utility {
+    private static String cost;
+
     public static Train handleTrainResponse(String response){
         //解析train数据
         try {
@@ -55,17 +59,20 @@ public class Utility {
     }
 
     //解析trainroute数据
+
     public static List<Segments> handleTrainRouteResponse(String response){
         try{
             JSONObject jsonObject=new JSONObject(response);
             JSONObject jsonObject1=jsonObject.getJSONObject("route");
             JSONArray jsonArray=jsonObject1.getJSONArray("transits");
             JSONObject jsonObject2=jsonArray.getJSONObject(0);
+            cost=jsonObject2.getString("cost");
             JSONArray jsonArray1=jsonObject2.getJSONArray("segments");
             String trainRouteContent1=jsonArray1.toString();
             Gson gson=new Gson();
             Type type=new TypeToken<List<Segments>>(){}.getType();
             List<Segments> list=gson.fromJson(trainRouteContent1,type);
+            Log.d("ugit", "handleTrainRouteResponse: kkk"+list.get(2).railway.name);
             return list;
             //return new Gson().fromJson(trainRouteContent1, Segments.class);
         }catch (Exception e){
@@ -73,7 +80,9 @@ public class Utility {
         }
         return null;
     }
-
+    public static String getCost(){
+        return cost;
+    }
 
     /**
      * 获取省份和城市
@@ -132,4 +141,7 @@ public class Utility {
         return null;
     }
 
+    public static void setCost(String cost) {
+        Utility.cost = cost;
+    }
 }

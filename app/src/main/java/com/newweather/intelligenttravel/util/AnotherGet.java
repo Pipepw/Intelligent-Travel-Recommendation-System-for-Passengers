@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.newweather.intelligenttravel.Entity.Segments;
 import com.newweather.intelligenttravel.Entity.Subway;
 import com.newweather.intelligenttravel.Entity.Train;
 import com.newweather.intelligenttravel.Entity.TrueSubway;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 import okhttp3.Call;
@@ -41,6 +43,7 @@ public class AnotherGet {
     private static String startLat = "";
     private static String endLng = "";
     private static String endLat = "";
+    private static List<Segments> segmentsList;
     public static void getTrain(final Handler myHandler, String startcity, String endcity, String date, final String time){
         @SuppressLint("HandlerLeak") Handler GetHanlder = new Handler(){
             @Override
@@ -67,26 +70,16 @@ public class AnotherGet {
                     }
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
+
                         final String responseText=response.body().string();
-                        train= Utility.handleTrainResponse(responseText);
-                        Bundle bundle=new Bundle();
-                        for(list List:train.getResult().listList){
-                            if(compare_date(List.getDeparturetime(),time)>0) {
-                                trueTrain.setDeparturetime(List.getDeparturetime());
-                                trueTrain.setArrivaltime(List.getArrivaltime());
-                                trueTrain.setStation(List.getStation());
-                                trueTrain.setEndstation(List.getEndstation());
-                                trueTrain.setCosttime(List.getCosttime());
-                                trueTrain.setTypename(List.getTypename());
-                                trueTrain.setPriceyd(List.getPriceyd());
-                                trueTrain.setPriceed(List.getPriceed());
-                                Message msg = new Message();
-                                msg.what = 1;
-                                msg.setData(bundle);
-                                myHandler.sendMessage(msg);
-                                break;
-                            }
-                        }
+                        //Bundle bundle=new Bundle();
+                        //Log.d(TAG, "onResponse: aaabbkkk"+responseText);
+                        segmentsList= Utility.handleTrainRouteResponse(responseText);
+                        Log.d(TAG, "onResponse: kkk cost = " + Utility.getCost());
+                        Message msg=new Message();
+                        msg.what=1;
+                        myHandler.sendMessage(msg);
+
                     }
                 });
                 }
@@ -145,5 +138,8 @@ public class AnotherGet {
     }
     public static TrueSubway getsubwayy(){
         return trueSubway;
+    }
+    public static List<Segments> getTrainRouteList(){
+        return segmentsList;
     }
 }

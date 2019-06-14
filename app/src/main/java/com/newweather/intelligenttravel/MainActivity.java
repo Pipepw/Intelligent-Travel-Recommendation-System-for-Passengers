@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 //                        Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getOrder_flag());
 //                        Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().getChoose_flag());
 //                        Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().getOrder_flag());
-                        Log.d(TAG, "handleMessage: kkk get it ? " + SomeUtil.getStartLat());
+                        Log.d(TAG, "handleMessage: kkk gssee+"+AnotherGet.getTrainRouteList().get(2).railway.name);
                         WaitDialog.dismiss();
                     } else if (msg.what == 2) {
                         super.handleMessage(msg);
