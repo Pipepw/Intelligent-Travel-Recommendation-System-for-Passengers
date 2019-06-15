@@ -1,11 +1,14 @@
 package com.newweather.intelligenttravel.util;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 import com.newweather.intelligenttravel.Entity.Flight;
+import com.newweather.intelligenttravel.Entity.Segments;
+import com.newweather.intelligenttravel.Entity.TrueSubway;
 import com.newweather.intelligenttravel.Entity.TrueTrain;
 import com.newweather.intelligenttravel.db.City;
 import com.newweather.intelligenttravel.db.Province;
@@ -13,6 +16,8 @@ import com.newweather.intelligenttravel.db.Province;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,50 +30,53 @@ public class PlanUtil {
 //    分别对应时间和费用最优解
     private Flight time_flight = new Flight();
     private Flight fare_flight = new Flight();
-    private TrueTrain time_train = new TrueTrain();
-    private TrueTrain fare_train = new TrueTrain();
+    private List<Segments> time_train;
+    private List<Segments> fare_train;
     private List<Province> provinceList;
     private List<City> cityList;
-    //AirportMap对应所有的机场，key是城市名，list为该城市所有的机场，所以调用的时候，要用循环的方式，AirportMap(CityName).size()
+    //AirportMap对应所有的机场，key是城市名，list为该城市所有的机场，所以调用的时候，要用循环的方式，AirportMap.get(CityName).size()
     private Map<String,List<String>> AirportMap = FlightUtil.GetAllAirport();
-    private String use_time_min = "12:22";
-    private String fare_min = "10000";
+    private String use_time_min = "24:22";
+    private String fare_min = "100000";
     private Handler myHandler;
 
     /**
      * 总的调用方法
      */
-    public void GetPlan(Handler mHanlder, String StartCity, String EndCity, String Date, String Time){
+    public void GetPlan(Context context, Handler mHandler, String StartCity, String EndCity, String Date, String Time){
         provinceList = LitePal.findAll(Province.class);
         AllFlight(StartCity,EndCity,Date,Time);
-        AllTrain(mHanlder,StartCity,EndCity,Date,Time);
+        AllTrain(context,mHandler,StartCity,EndCity,Date,Time);
+        TrainToFlight(context,mHandler,StartCity,EndCity,Date,Time);
     }
     /**
      * 全程飞机的情况，只考虑初末城市
      * 先获取交通工具的实例，然后获取其花费的时间以及费用，然后分别于最小的进行比较
      */
     public void AllFlight(String StartCity, String EndCity, String Date, String Time){
-        Flight flight = FlightUtil.GetFligt(StartCity, EndCity, Date, Time);
-        if(flight!=null){
+        Flight flight = FlightUtil.GetFligt(StartCity, EndCity, Date, SomeUtil.AddTime(Time,"01:30"));
+        if(flight.getStartTime()!=null){
             String useTime = SomeUtil.getTime(flight.getEndTime(),flight.getStartTime());
             String fare = flight.getFare();
-            Log.d(TAG, "handleMessage: kkk flight  fare = " + fare);
-            Log.d(TAG, "handleMessage: kkk flight  usetime = " + useTime);
 //        getTime方法，前小后大返回false
-            if(SomeUtil.getTime(useTime,getUsetime_min()).equals("false")){
+            if(SomeUtil.getTime(useTime,use_time_min).equals("false")){
 //            在这里面将flight的信息获取下来，最后通过set来将全局的flight设置为该flight
                 flight.setChoose_flag(1);
+                if(time_train!=null){
+                    time_train.get(0).setChoose_flag(0);
+                }
                 flight.setOrder_flag(1);
-                time_train.setChoose_flag(0);
                 time_flight = flight;
                 setUsetime_min(useTime);
             }
             if(Float.parseFloat(flight.getFare())<Float.parseFloat(fare_min)){
                 flight.setChoose_flag(1);
+                if(fare_train!=null){
+                    fare_train.get(0).setChoose_flag(0);
+                }
                 flight.setOrder_flag(1);
-                fare_train.setChoose_flag(0);
                 fare_flight = flight;
-                setFare_min(fare);
+                fare_min = fare;
             }
         }
 
@@ -76,50 +84,117 @@ public class PlanUtil {
 
     /**
      * 全程火车的情况
-     * @param StartCity
-     * @param EndCity
-     * @param Date
-     * @param Time
      */
     @SuppressLint("HandlerLeak")
-    public void AllTrain(Handler mHanlder,String StartCity, String EndCity, String Date, String Time){
+    public void AllTrain(Context context, Handler mHandler,String StartCity, String EndCity, String Date, String Time){
         myHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 if(msg.what == 1){
-                    TrueTrain train =  AnotherGet.gettrain();
-                    String useTime = SomeUtil.getTime(train.getArrivaltime(),train.getDeparturetime());
-                    String fare = train.getPriceed();
-                    Log.d(TAG, "handleMessage: kkk train  fare = " + fare);
-                    Log.d(TAG, "handleMessage: kkk train  usetime = " + useTime);
-                    if(SomeUtil.getTime(useTime,getUsetime_min()).equals("false")){
-                        train.setChoose_flag(1);
-                        train.setOrder_flag(1);
+                    List<Segments> train =  AnotherGet.getTrainRouteList();
+                    String startime = train.get(0).railway.departure_stop.departure_time;
+                    String endtime = train.get(train.size()-1).railway.arrival_stop.arrival_time;
+                    String usetime = SomeUtil.getTime(endtime,startime);
+                    String fare = train.get(0).cost;
+                    if(SomeUtil.getTime(usetime,use_time_min).equals("false")){
+                        use_time_min = usetime;
+                        train.get(0).setChoose_flag(1);
                         time_flight.setChoose_flag(0);
+                        train.get(0).setOrder_flag(1);
                         time_train = train;
-                        setUsetime_min(useTime);
                     }
                     if(Float.parseFloat(fare)<Float.parseFloat(fare_min)){
-                        train.setChoose_flag(1);
-                        train.setOrder_flag(1);
+                        fare_min = fare;
+                        train.get(0).setChoose_flag(1);
                         fare_flight.setChoose_flag(0);
+                        train.get(0).setOrder_flag(1);
                         fare_train = train;
-                        setFare_min(fare);
                     }
                     Message message = new Message();
                     message.what = 1;
-                    mHanlder.sendMessage(message);
+                    mHandler.sendMessage(message);
                 }
             }
         };
-        AnotherGet.getTrain(myHandler, StartCity, EndCity, Date, Time);
+        AnotherGet.getTrain(context, myHandler, StartCity, EndCity, Date, Time);
     }
 
     /**
      * 先火车后飞机的情况
      */
-    public void TrainToFlight(Handler mHandler,String StartCity, String EndCity, String Date, String Time){
+    @SuppressLint("HandlerLeak")
+    public void TrainToFlight(Context context, Handler mHandler, String StartCity, String EndCity, String Date, String Time){
+
+//        到达城市有飞机时，才能满足条件
+        if(AirportMap.get(EndCity)!=null){
+            for(Province province:provinceList){
+                cityList = LitePal.where("provinceId = ?",String
+                        .valueOf(province.getId())).find(City.class);
+                for(City city : cityList){
+                    if(city.getCityName().equals(StartCity)||city.getCityName().equals(EndCity)){
+                        continue;
+                    }
+//                    接收火车发送的消息
+                    myHandler = new Handler(){
+                        @Override
+                        public void handleMessage(Message msg) {
+                            super.handleMessage(msg);
+                            if(msg.what == 1){
+                                List<Segments> train =  AnotherGet.getTrainRouteList();
+//                                接收地铁发送的消息
+                                Handler subHandler = new Handler(){
+                                    @Override
+                                    public void handleMessage(Message msg) {
+                                        super.handleMessage(msg);
+//                                    获取地铁之后再继续往下执行
+                                        if(msg.what == 2){
+//                                        地铁花费的时间
+                                            String subwaytime = AnotherGet.getsubwayy().totalduration;
+//                                        飞机出发的时间，没有考虑超过一天的情况，多加1:30用于候机
+                                            String flightstarttime = SomeUtil.AddTime(subwaytime,train.get(train.size()-1).railway.arrival_stop.arrival_time,"01:30");
+                                            Flight flight = FlightUtil.GetFligt(StartCity,EndCity,Date,flightstarttime);
+//                                        最初的出发的时间
+                                            String startime = train.get(0).railway.departure_stop.departure_time;
+                                            String endtime = flight.getEndTime();//飞机到达的时间
+                                            String usetime = SomeUtil.getTime(endtime,startime);
+                                            Float fare = Float.parseFloat(train.get(0).cost)+Float.parseFloat(flight.getFare());
+                                            if(SomeUtil.getTime(usetime,use_time_min).equals("false")){
+                                                use_time_min = usetime;
+                                                train.get(0).setChoose_flag(1);
+                                                train.get(0).setOrder_flag(1);
+                                                flight.setChoose_flag(1);
+                                                flight.setOrder_flag(2);
+                                                time_train = train;
+                                                time_flight = flight;
+                                            }
+                                            if(fare<Float.parseFloat(fare_min)){
+                                                fare_min = String.valueOf(fare);
+                                                train.get(0).setChoose_flag(1);
+                                                train.get(0).setOrder_flag(1);
+                                                flight.setChoose_flag(1);
+                                                flight.setOrder_flag(2);
+                                                fare_train = train;
+                                                fare_flight = flight;
+                                            }
+//                                            Message message = new Message();
+//                                            message.what = 1;
+//                                            mHandler.sendMessage(message);
+                                        }
+                                    }
+                                };
+                                if(AirportMap.get(city.getCityName()).size()==1) {
+                                    AnotherGet.getSubway(subHandler,city.getCityName(), city.getCityName(), train.get(train.size() - 1)
+                                            .railway.arrival_stop.arrival_name, AirportMap.get(city.getCityName()).get(0));
+                                }
+                            }
+                        }
+                    };
+//                从出发点到一个中转城市的火车
+                    AnotherGet.getTrain(context,myHandler, StartCity, city.getCityName(), Date, Time);
+                }
+            }
+        }
 
     }
 
@@ -127,7 +202,7 @@ public class PlanUtil {
      * 先飞机后火车的情况
      * @return
      */
-    public void FlightToTrain(Handler mHandler,String StartCity, String EndCity, String Date, String Time){
+    public void FlightToTrain(Context context, Handler mHandler,String StartCity, String EndCity, String Date, String Time){
         for(Province province:provinceList){
             cityList = LitePal.where("provinceId = ?",String.valueOf(province.getId())).find(City.class);
 //            遍历所有城市，找出所有情况
@@ -142,12 +217,12 @@ public class PlanUtil {
                                 super.handleMessage(msg);
                                 if(msg.what == 1){
                                     TrueTrain train = AnotherGet.gettrain();
-                                    String useTime = SomeUtil.getTime(train.getArrivaltime(),Time);
+//                                    String useTime = SomeUtil.getTime(train.getArrivaltime(),Time);
                                     String fare = flight.getFare();
                                 }
                             }
                         };
-                        AnotherGet.getTrain(myHandler,city.getCityName(),EndCity,Date,flight.getEndTime());
+                        AnotherGet.getTrain(context,myHandler,city.getCityName(),EndCity,Date,flight.getEndTime());
                     }
                 }
             }
@@ -206,19 +281,16 @@ public class PlanUtil {
         this.fare_min = fare_min;
     }
 
-    public TrueTrain getTime_train() {
+    public List<Segments> getTime_train(){
         return time_train;
     }
 
-    public void setTime_train(TrueTrain time_train) {
-        this.time_train = time_train;
+    public void setTime_train(List<Segments> list){
+        time_train = list;
     }
 
-    public TrueTrain getFare_train() {
+    public List<Segments> getFare_train(){
         return fare_train;
     }
 
-    public void setFare_train(TrueTrain fare_train) {
-        this.fare_train = fare_train;
-    }
 }

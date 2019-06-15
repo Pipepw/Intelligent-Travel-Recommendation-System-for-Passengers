@@ -1,6 +1,7 @@
 package com.newweather.intelligenttravel.util;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
@@ -35,7 +36,6 @@ import static org.litepal.LitePalBase.TAG;
  * 获取火车的相关数据
  */
 public class AnotherGet {
-    private static Train train;
     private static TrueTrain trueTrain=new TrueTrain();
     private static Subway subway;
     private static TrueSubway trueSubway=new TrueSubway();
@@ -44,7 +44,7 @@ public class AnotherGet {
     private static String endLng = "";
     private static String endLat = "";
     private static List<Segments> segmentsList;
-    public static void getTrain(final Handler myHandler, String startcity, String endcity, String date, final String time){
+    public static void getTrain(Context context, final Handler myHandler, String startcity, String endcity, String date, final String time){
         @SuppressLint("HandlerLeak") Handler GetHanlder = new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -63,6 +63,7 @@ public class AnotherGet {
                     String trainUrl="https://restapi.amap.com/v3/direction/transit/integrated?key=0207fc16251cf7d3487948f8949cf2b7" +
                             "&origin="+ startLng +","+startLat+"&destination="+endLng+","+endLat+"&city="+startcity+"&cityd="+endcity+"&strategy=0" +
                             "&date="+date+"&time="+time;
+                    Log.d(TAG, "handleMessage: get it? " + trainUrl);
                     HttpUtil.sendOkHttpRequest(trainUrl, new okhttp3.Callback() {
                     @Override
                     public void onFailure(okhttp3.Call call, IOException e) {
@@ -72,10 +73,7 @@ public class AnotherGet {
                     public void onResponse(Call call, Response response) throws IOException {
 
                         final String responseText=response.body().string();
-                        //Bundle bundle=new Bundle();
-                        //Log.d(TAG, "onResponse: aaabbkkk"+responseText);
                         segmentsList= Utility.handleTrainRouteResponse(responseText);
-                        Log.d(TAG, "onResponse: kkk cost = " + Utility.getCost());
                         Message msg=new Message();
                         msg.what=1;
                         myHandler.sendMessage(msg);
@@ -86,7 +84,7 @@ public class AnotherGet {
             }
         };
 //        获取经纬度
-        SomeUtil.GetLaL(GetHanlder,startcity,endcity);
+        SomeUtil.GetLaL(context,GetHanlder,startcity,endcity);
     }
 
 //    获取地铁
