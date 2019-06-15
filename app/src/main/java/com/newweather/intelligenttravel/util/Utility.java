@@ -18,7 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -27,7 +30,6 @@ import static android.content.ContentValues.TAG;
  * 保存返回的数据
  */
 public class Utility {
-    private static String cost;
 
     public static Train handleTrainResponse(String response){
         //解析train数据
@@ -62,6 +64,7 @@ public class Utility {
 
     public static List<Segments> handleTrainRouteResponse(String response){
         try{
+            String cost;
             JSONObject jsonObject=new JSONObject(response);
             JSONObject jsonObject1=jsonObject.getJSONObject("route");
             JSONArray jsonArray=jsonObject1.getJSONArray("transits");
@@ -72,18 +75,23 @@ public class Utility {
             Gson gson=new Gson();
             Type type=new TypeToken<List<Segments>>(){}.getType();
             List<Segments> list=gson.fromJson(trainRouteContent1,type);
-            Log.d("ugit", "handleTrainRouteResponse: kkk"+list.get(2).railway.name);
-            return list;
+            list.get(0).cost = cost;
+            ArrayList<Segments> trueList = new ArrayList<>();
+            for(Segments segments:list){
+                if(segments.railway.name!=null){
+                    segments.railway.arrival_stop.arrival_time=SomeUtil.TransToTime(segments.railway.arrival_stop.arrival_time);
+                    segments.railway.departure_stop.departure_time=SomeUtil.TransToTime(segments.railway.departure_stop.departure_time);
+                    trueList.add(segments);
+                }
+            }
+            trueList.get(0).cost = cost;
+            return trueList;
             //return new Gson().fromJson(trainRouteContent1, Segments.class);
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
     }
-    public static String getCost(){
-        return cost;
-    }
-
     /**
      * 获取省份和城市
      */
@@ -132,7 +140,6 @@ public class Utility {
         try {
             JSONObject jsonObject=new JSONObject(response);
             String LaLContent=jsonObject.toString();
-
             return new Gson().fromJson(LaLContent, LngAndLat.class);
 
         }catch (Exception e){
@@ -141,7 +148,4 @@ public class Utility {
         return null;
     }
 
-    public static void setCost(String cost) {
-        Utility.cost = cost;
-    }
 }

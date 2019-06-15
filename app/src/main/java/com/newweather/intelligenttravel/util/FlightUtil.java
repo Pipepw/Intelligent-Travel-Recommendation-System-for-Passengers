@@ -197,7 +197,7 @@ public class FlightUtil {
         String[] spString = All.split("\\s+");
 
         for(int i=0;i<spString.length;i++){
-            Log.d(TAG, "GetAllAirport:  all kkk " + spString[i]);
+//            Log.d(TAG, "GetAllAirport:  all kkk " + spString[i]);
             if((i+1)%4==0){
 //                如果不存在，则增加一个新的list，存在则直接向其中添加
                 if(AirportMap.get(spString[i-2])==null){

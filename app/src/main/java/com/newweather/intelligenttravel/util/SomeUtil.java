@@ -1,5 +1,8 @@
 package com.newweather.intelligenttravel.util;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -44,60 +47,131 @@ public class SomeUtil {
     }
 
     /**
+     * 获取时间相加的结果
+     */
+    public static String AddTime(String time1, String time2){
+        String[] spString1 = time1.split(":");
+        String[] spString2 = time2.split(":");
+        int time1_H = Integer.valueOf(spString1[0]);
+        int time1_M = Integer.valueOf(spString1[1]);
+        int time2_H = Integer.valueOf(spString2[0]);
+        int time2_M = Integer.valueOf(spString2[1]);
+        int getHour = time1_H+time2_H;
+        int getMine = time1_M+time2_M;
+        if(getMine>=60){
+            getMine %= 60;
+            getHour++;
+        }
+        return getHour+":"+getMine;
+    }
+    public static String AddTime(String time1, String time2, String time3){
+        String[] spString1 = time1.split(":");
+        String[] spString2 = time2.split(":");
+        String[] spString3 = time3.split(":");
+        int time1_H = Integer.valueOf(spString1[0]);
+        int time1_M = Integer.valueOf(spString1[1]);
+        int time2_H = Integer.valueOf(spString2[0]);
+        int time2_M = Integer.valueOf(spString2[1]);
+        int time3_H = Integer.valueOf(spString3[0]);
+        int time3_M = Integer.valueOf(spString3[1]);
+        int getHour = time1_H+time2_H+time3_H;
+        int getMine = time1_M+time2_M+time3_M;
+        if(getMine>=60){
+            getMine %= 60;
+            getHour++;
+        }
+        return getHour+":"+getMine;
+    }
+
+
+
+    /**
      * 获取城市的经纬度
      * @param startCity
      */
-    public static void GetLaL(Handler LaLHandler, final String startCity, final String endCity){
+    public static void GetLaL(Context context, Handler LaLHandler, final String startCity, final String endCity){
         String startLaL = "https://apis.map.qq.com/ws/geocoder/v1/?address="+startCity+"&key=3BYBZ-U6DKI-L5WGH-5EQXL-PJCBZ-LQFMK";
         String endLaL = "https://apis.map.qq.com/ws/geocoder/v1/?address="+endCity+"&key=3BYBZ-U6DKI-L5WGH-5EQXL-PJCBZ-LQFMK";
-        HttpUtil.sendOkHttpRequest(startLaL, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure: get startLaL failed");
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                final LngAndLat lngAndLat = Utility.handleLngALat(responseText);
+        SharedPreferences pref = context.getSharedPreferences("LaL",Context.MODE_PRIVATE);
+//        内存中没有时才访问网络，有的话就直接读取
+        if(pref.getString(startCity+"Lat","").equals("")){
+            for(int i=0;i<10000;i++);
+            HttpUtil.sendOkHttpRequest(startLaL, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e(TAG, "onFailure: get startLaL failed");
+                }
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final String responseText = response.body().string();
+                    final LngAndLat lngAndLat = Utility.handleLngALat(responseText);
 //                Lng为经度，Lat为维度
-                startLng = lngAndLat.result.location.lng;
-                startLat = lngAndLat.result.location.lat;
-                Message msg = new Message();
-                msg.what = 1;
-                LaLHandler.sendMessage(msg);
-            }
-        });
-        HttpUtil.sendOkHttpRequest(endLaL, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure: get endLaL failed");
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                final LngAndLat lngAndLat = Utility.handleLngALat(responseText);
+                    if(lngAndLat!=null){
+                        startLng = LngAndLat.result.location.lng;
+                        startLat = LngAndLat.result.location.lat;
+                        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = context.getSharedPreferences("LaL",Context.MODE_PRIVATE).edit();
+                        editor.putString(startCity+"Lat",LngAndLat.result.location.lat);
+                        editor.putString(startCity+"Lng",LngAndLat.result.location.lng);
+                        Message msg = new Message();
+                        msg.what = 1;
+                        LaLHandler.sendMessage(msg);
+                    }
+                }
+            });
+        }else {
+            startLng = pref.getString(startCity+"Lng","");
+            startLat = pref.getString(startCity+"Lat","");
+            Message msg = new Message();
+            msg.what = 1;
+            LaLHandler.sendMessage(msg);
+        }
+        if(pref.getString(endCity+"Lat","").equals("")){
+            for(int i=0;i<10000;i++);
+            //        获取结束时的经纬度
+            HttpUtil.sendOkHttpRequest(endLaL, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e(TAG, "onFailure: get endLaL failed");
+                }
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    final String responseText = response.body().string();
+
+                    Log.d(TAG, "onResponse: kkk response = " + responseText);
+                    final LngAndLat lngAndLat = Utility.handleLngALat(responseText);
 //                Lng为经度，Lat为维度
-                endLng = lngAndLat.result.location.lng;
-                endLat = lngAndLat.result.location.lat;
-                Message msg = new Message();
-                msg.what = 2;
-                LaLHandler.sendMessage(msg);
-            }
-        });
+                    assert lngAndLat != null;
+                    endLng = LngAndLat.result.location.lng;
+                    endLat = LngAndLat.result.location.lat;
+                    @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = context.getSharedPreferences("LaL",Context.MODE_PRIVATE).edit();
+                    editor.putString(endCity+"Lat",LngAndLat.result.location.lat);
+                    editor.putString(endCity+"Lng",LngAndLat.result.location.lng);
+                    Message msg = new Message();
+                    msg.what = 2;
+                    LaLHandler.sendMessage(msg);
+                }
+            });
+        }else{
+            endLng = pref.getString(endCity+"Lng","");
+            endLat = pref.getString(endCity+"Lat","");
+            Message msg = new Message();
+            msg.what = 2;
+            LaLHandler.sendMessage(msg);
+        }
     }
 
     /**
-     * 将字符串转换为时间
+     * 将字符串1234转换为时间12:34
      * @param time_str
      * @return
      */
     public static String TransToTime(String time_str){
         String str_hour = time_str.substring(0,2);
         String str_mine = time_str.substring(2,4);
-        Log.d(TAG, "TransToTime: kkk hour = " + str_hour);
-        Log.d(TAG, "TransToTime: kkk mine = " + str_mine);
+//        Log.d(TAG, "TransToTime: kkk hour = " + str_hour);
+//        Log.d(TAG, "TransToTime: kkk mine = " + str_mine);
         String time = str_hour + ":"+str_mine;
-        Log.d(TAG, "TransToTime: kkk time = " + time);
+//        Log.d(TAG, "TransToTime: kkk time = " + time);
         return time;
     }
 
