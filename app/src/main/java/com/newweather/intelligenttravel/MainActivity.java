@@ -26,6 +26,7 @@ import com.newweather.intelligenttravel.util.SomeUtil;
 import com.newweather.intelligenttravel.util.TimePickerDialogUtil;
 
 import com.newweather.intelligenttravel.util.AnotherGet;
+import com.newweather.intelligenttravel.util.Utility;
 import com.newweather.intelligenttravel.util.WaitDialog;
 
 
@@ -118,32 +119,35 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
             }else{
                 PlanUtil planUtil = new PlanUtil();
                 Log.d(TAG, "onCreate:  kkk it has start");
+                final int[] i = {0};
 
                 myHandler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
                         if (msg.what == 1) {
                             super.handleMessage(msg);
+                            i[0]++;
+                            Log.d(TAG, "handleMessage:  kkk main i = " + i[0]);
                             Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
                             WaitDialog.dismiss();
                         } else if (msg.what == 2) {
                             super.handleMessage(msg);
-                            trueSubway = AnotherGet.getsubwayy();//获取trueSubway实例
+                            String time = AnotherGet.GetSubwayTime();//获取trueSubway实例
                             // totalduration即公共交通总时间
-                            Log.d(TAG, "handleMessage: kkk sub " + trueSubway.getTotalduration());
+                            Log.d(TAG, "handleMessage: kkk sub " + time);
                         }
                     }
                 };
-                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
-                //SomeUtil.GetLaL(myHandler,"乐山");
+                planUtil.GetPlan(myHandler,StartCity,EndCity,Date,Time);
+//                AnotherGet.GetSubway(myHandler,"杭州","萧山国际机场","杭州站");
                 //参数实例
 //            AnotherGet.getTrain(myHandler, "杭州", "北京", "2019-6-13", "8:00");
-//            AnotherGet.getSubway(myHandler, "杭州", "杭州", "西溪竞舟苑", "杭州汽车北站");
+//            AnotherGet.getSubway(myHandler, "杭州", "杭州", "萧山国际机场", "杭州站");
             }
-
+//120.443341,30.240638 xiao 120.189606,30.249207 hang
         });
     }
 

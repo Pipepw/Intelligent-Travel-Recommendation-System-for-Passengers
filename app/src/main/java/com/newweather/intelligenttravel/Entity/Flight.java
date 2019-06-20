@@ -1,6 +1,12 @@
 package com.newweather.intelligenttravel.Entity;
 
-public class Flight {
+import android.util.Log;
+
+import com.newweather.intelligenttravel.util.SomeUtil;
+
+import java.io.Serializable;
+
+public class Flight implements Serializable {
     private String StartTime;
     private String EndTime;
     private String StartStation;
@@ -8,13 +14,18 @@ public class Flight {
     private String Fare;
     private int order_flag;//1表示先，2表示后
     private int choose_flag;//0表示无，1表示有
+    private static final String TAG = "Flight";
 
     public String getStartTime() {
         return StartTime;
     }
 
     public void setStartTime(String startTime) {
+        Log.d(TAG, "setStartTime: startstation = " + StartStation);
+        Log.d(TAG, "setStartTime: endstation = " + EndStation);
+        Log.d(TAG, "setStartTime:  starttime = " + StartTime);
         StartTime = startTime;
+
     }
 
     public String getEndTime() {
@@ -23,6 +34,7 @@ public class Flight {
 
     public void setEndTime(String endTime) {
         EndTime = endTime;
+        Log.d(TAG, "setEndTime:  endtime = " + EndTime);
     }
 
     public String getStartStation() {

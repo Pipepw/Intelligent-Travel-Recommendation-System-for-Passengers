@@ -31,51 +31,24 @@ import static android.content.ContentValues.TAG;
  */
 public class Utility {
 
-    public static Train handleTrainResponse(String response){
-        //解析train数据
-        try {
-            JSONObject jsonObject=new JSONObject(response);
-            String trainContent=jsonObject.toString();
-            //Log.d("ac",trainContent);
-            return new Gson().fromJson(trainContent, Train.class);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Subway handleSubwayResponse(String response){
-        //解析subway数据
-        try {
-            JSONObject jsonObject=new JSONObject(response);
-            String subwayContent=jsonObject.toString();
-            //Log.d("Util",subwayContent);
-
-            return new Gson().fromJson(subwayContent, Subway.class);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     //解析trainroute数据
+//    在这里面进行选择
 
     public static List<Segments> handleTrainRouteResponse(String response){
         try{
             String cost;
+            String duration;
             JSONObject jsonObject=new JSONObject(response);
             JSONObject jsonObject1=jsonObject.getJSONObject("route");
             JSONArray jsonArray=jsonObject1.getJSONArray("transits");
             JSONObject jsonObject2=jsonArray.getJSONObject(0);
             cost=jsonObject2.getString("cost");
+            duration = jsonObject2.getString("duration");
             JSONArray jsonArray1=jsonObject2.getJSONArray("segments");
             String trainRouteContent1=jsonArray1.toString();
             Gson gson=new Gson();
             Type type=new TypeToken<List<Segments>>(){}.getType();
             List<Segments> list=gson.fromJson(trainRouteContent1,type);
-            list.get(0).cost = cost;
             ArrayList<Segments> trueList = new ArrayList<>();
             for(Segments segments:list){
                 if(segments.railway.name!=null){
@@ -85,6 +58,7 @@ public class Utility {
                 }
             }
             trueList.get(0).cost = cost;
+            trueList.get(0).usetime = SomeUtil.TransToTime(duration);
             return trueList;
             //return new Gson().fromJson(trainRouteContent1, Segments.class);
         }catch (Exception e){
@@ -140,12 +114,44 @@ public class Utility {
         try {
             JSONObject jsonObject=new JSONObject(response);
             String LaLContent=jsonObject.toString();
+//            Log.d(TAG, "handleLngALat: kkk content = " + LaLContent);
             return new Gson().fromJson(LaLContent, LngAndLat.class);
-
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 通过高德地图获取公交时间
+     * 在这里面进行选择
+     */
+    public static int handleSubwayRouteResponse(String response){
+        int subwaytime = 0;
+        try{
+            JSONObject jsonObject=new JSONObject(response);
+            JSONObject jsonObject1=jsonObject.getJSONObject("route");
+            JSONArray jsonArray=jsonObject1.getJSONArray("transits");
+            JSONObject jsonObject2=jsonArray.getJSONObject(0);
+            JSONArray jsonArray1=jsonObject2.getJSONArray("segments");
+            String trainRouteContent1=jsonArray1.toString();
+            Gson gson=new Gson();
+            Type type=new TypeToken<List<Segments>>(){}.getType();
+//            List是返回来的所有数据
+            List<Segments> list=gson.fromJson(trainRouteContent1,type);
+            for(Segments segments:list){
+                if(segments.walking!=null){
+                    subwaytime +=segments.walking.duration;
+                }
+                if(segments.bus!=null){
+                    subwaytime += segments.bus.buslines.get(0).busduration;
+                }
+            }
+            //return new Gson().fromJson(trainRouteContent1, Segments.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return subwaytime;
     }
 
 }

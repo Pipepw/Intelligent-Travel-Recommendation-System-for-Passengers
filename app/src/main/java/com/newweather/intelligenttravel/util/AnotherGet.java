@@ -1,33 +1,23 @@
 package com.newweather.intelligenttravel.util;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.newweather.intelligenttravel.Entity.Segments;
-import com.newweather.intelligenttravel.Entity.Subway;
-import com.newweather.intelligenttravel.Entity.Train;
-import com.newweather.intelligenttravel.Entity.TrueSubway;
 import com.newweather.intelligenttravel.Entity.TrueTrain;
-import com.newweather.intelligenttravel.Gson.Result1;
-import com.newweather.intelligenttravel.Gson.list;
-import com.newweather.intelligenttravel.MainActivity;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 import static org.litepal.LitePalBase.TAG;
@@ -37,34 +27,33 @@ import static org.litepal.LitePalBase.TAG;
  */
 public class AnotherGet {
     private static TrueTrain trueTrain=new TrueTrain();
-    private static Subway subway;
-    private static TrueSubway trueSubway=new TrueSubway();
+    private static int subwaytime;
     private static String startLng = "";
     private static String startLat = "";
     private static String endLng = "";
     private static String endLat = "";
     private static List<Segments> segmentsList;
-    public static void getTrain(Context context, final Handler myHandler, String startcity, String endcity, String date, final String time){
-        @SuppressLint("HandlerLeak") Handler GetHanlder = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
 
-                super.handleMessage(msg);
-                if(msg.what==1){
-                    startLng = SomeUtil.getStartLng();
-                    startLat = SomeUtil.getStartLat();
-                }
-                if(msg.what==2){
-                    endLng = SomeUtil.getEndLng();
-                    endLat = SomeUtil.getEndLat();
-                }
-//                出发城市以及目标城市的经纬度都获取了之后才开始后面的任务
-                if(!(startLng.equals(""))&&!(endLng.equals(""))){
-                    String trainUrl="https://restapi.amap.com/v3/direction/transit/integrated?key=0207fc16251cf7d3487948f8949cf2b7" +
-                            "&origin="+ startLng +","+startLat+"&destination="+endLng+","+endLat+"&city="+startcity+"&cityd="+endcity+"&strategy=0" +
-                            "&date="+date+"&time="+time;
-                    Log.d(TAG, "handleMessage: get it? " + trainUrl);
-                    HttpUtil.sendOkHttpRequest(trainUrl, new okhttp3.Callback() {
+    public static void getTrain(Map<String, String> LaLMap, final Handler myHandler, String startcity, String endcity, String date, final String time){
+//        能够直接从map中获取经纬度时
+        if(LaLMap.get(startcity)!=null&&LaLMap.get(endcity)!=null){
+            String startLal = LaLMap.get(startcity).toString();
+            Log.d(TAG, "getTrain: kkk end city = " + endcity);
+            Log.d(TAG, "getTrain: kkk stat city = " +startcity);
+            Log.d(TAG, "getTrain: kkk city = " + LaLMap.get(endcity));
+            String endLal = LaLMap.get(endcity).toString();
+            String[] startsp = startLal.split("\\s+");
+            String[] endsp = endLal.split("\\s+");
+            startLng = startsp[1];
+            startLat = startsp[0];
+            endLng = endsp[1];
+            endLat = endsp[0];
+            if(!(startLng.equals(""))&&!(endLng.equals(""))){
+                String trainUrl="https://restapi.amap.com/v3/direction/transit/integrated?key=1880efe9146aed667f188cd171df3f7c" +
+                        "&origin="+ startLng +","+startLat+"&destination="+endLng+","+endLat+"&city="+startcity+"&cityd="+endcity+"&strategy=0" +
+                        "&date="+date+"&time="+time;
+                Log.d(TAG, "handleMessage: kkk get it? " + trainUrl);
+                HttpUtil.sendOkHttpRequest(trainUrl, new okhttp3.Callback() {
                     @Override
                     public void onFailure(okhttp3.Call call, IOException e) {
                         e.printStackTrace();
@@ -74,70 +63,120 @@ public class AnotherGet {
 
                         final String responseText=response.body().string();
                         segmentsList= Utility.handleTrainRouteResponse(responseText);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelableArrayList("train", (ArrayList<? extends Parcelable>) segmentsList);
                         Message msg=new Message();
                         msg.what=1;
+                        msg.setData(bundle);
                         myHandler.sendMessage(msg);
 
                     }
                 });
+            }
+        }else{//不能从map中直接获取时，从api中获取
+            @SuppressLint("HandlerLeak") Handler LaLHandler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    if(msg.what==1) {
+                        startLng = SomeUtil.getStartLng();
+                        startLat = SomeUtil.getStartLat();
+
+                    }
+                    if(msg.what==2) {
+                        endLng = SomeUtil.getEndLng();
+                        endLat = SomeUtil.getEndLat();
+                    }
+                    //                出发城市以及目标城市的经纬度都获取了之后才开始后面的任务
+                    if(!(startLng.equals(""))&&!(endLng.equals(""))){
+                        String trainUrl="https://restapi.amap.com/v3/direction/transit/integrated?key=1880efe9146aed667f188cd171df3f7c" +
+                                "&origin="+ startLng +","+startLat+"&destination="+endLng+","+endLat+"&city="+startcity+"&cityd="+endcity+"&strategy=0" +
+                                "&date="+date+"&time="+time;
+                        Log.d(TAG, "handleMessage: train get it? " + trainUrl);
+                        HttpUtil.sendOkHttpRequest(trainUrl, new okhttp3.Callback() {
+                            @Override
+                            public void onFailure(okhttp3.Call call, IOException e) {
+                                e.printStackTrace();
+                            }
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+
+                                final String responseText=response.body().string();
+                                segmentsList = Utility.handleTrainRouteResponse(responseText);
+                                Bundle bundle = new Bundle();
+                                ArrayList list = new ArrayList();
+                                list.add(segmentsList);
+                                bundle.putParcelableArrayList("train", (ArrayList<? extends Parcelable>) segmentsList);
+                                Message msg=new Message();
+                                msg.what=1;
+                                msg.setData(bundle);
+                                myHandler.sendMessage(msg);
+                            }
+                        });
+                    }
+                }
+            };
+            SomeUtil.GetLaL(LaLHandler,startcity,endcity);
+        }
+    }
+
+
+
+    public static void GetSubway(Handler myHandler,String city,String start,String end){
+        @SuppressLint("HandlerLeak") Handler LaLHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if(msg.what==1) {
+                    startLng = SomeUtil.getStartLng();
+                    startLat = SomeUtil.getStartLat();
+
+                }
+                if(msg.what==2) {
+                    endLng = SomeUtil.getEndLng();
+                    endLat = SomeUtil.getEndLat();
+                }
+                //                出发地点以及目标地点的经纬度都获取了之后才开始后面的任务
+                if(!(startLng.equals(""))&&!(endLng.equals(""))){
+                    String subwayUrl="https://restapi.amap.com/v3/direction/transit/integrated?key=0207fc16251cf7d3487948f8949cf2b7" +
+                            "&origin="+ startLng +","+startLat+"&destination="+endLng+","+endLat+"&city="+city+"&strategy=0";
+                    Log.d(TAG, "handleMessage: sub get it? " + subwayUrl);
+                    HttpUtil.sendOkHttpRequest(subwayUrl, new okhttp3.Callback() {
+                        @Override
+                        public void onFailure(okhttp3.Call call, IOException e) {
+                            e.printStackTrace();
+                        }
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+
+                            final String responseText=response.body().string();
+                            subwaytime = Utility.handleSubwayRouteResponse(responseText);
+//                            Log.d(TAG, "onResponse: kkk subway = " + subwaytime);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("subawy",subwaytime);
+                            Message msg=new Message();
+                            msg.what=2;
+                            msg.setData(bundle);
+                            myHandler.sendMessage(msg);
+                        }
+                    });
                 }
             }
         };
-//        获取经纬度
-        SomeUtil.GetLaL(context,GetHanlder,startcity,endcity);
+        SomeUtil.GetLaL(LaLHandler,start,end);
     }
 
-//    获取地铁
-    public static void getSubway(Handler myHandler,String city,String endcity,String start,String end){
-        String subwayUrl = " https://api.jisuapi.com/transit/station2s?city="+city+"&endcity="+endcity+"&start="+start+"&end="+end+"&appkey=e74dd71c6e53e1c1";
-        HttpUtil.sendOkHttpRequest(subwayUrl, new Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                e.printStackTrace();
-            }
+    /**
+     * 将秒转化为时分
+     */
 
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                subway = Utility.handleSubwayResponse(responseText);
-                Bundle bundle=new Bundle();
-                for(Result1 mresult:subway.ResultList){
-                    trueSubway.setTotalduration(mresult.getTotalduration());
-                    trueSubway.setTotalprice(mresult.getTotalprice());
-                    Message msg=new Message();
-                    msg.what=2;
-                    msg.setData(bundle);
-                    myHandler.sendMessage(msg);
-                    break;
-                }
-
-            }
-        });
-    }
-    public static int compare_date(String DATE1, String DATE2) {
-        DateFormat df = new SimpleDateFormat("hh:mm");
-        try {
-            Date dt1 = df.parse(DATE1);
-            Date dt2 = df.parse(DATE2);
-            if (dt1.getTime() > dt2.getTime()) {
-                return 1;
-            } else if (dt1.getTime() < dt2.getTime()) {
-                return -1;
-            } else {
-                return 0;
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return 0;
-    }
     public static TrueTrain gettrain(){
         return trueTrain;
     }
-    public static TrueSubway getsubwayy(){
-        return trueSubway;
-    }
     public static List<Segments> getTrainRouteList(){
         return segmentsList;
+    }
+    public static String GetSubwayTime(){
+        return SomeUtil.Transtime(subwaytime);
     }
 }
