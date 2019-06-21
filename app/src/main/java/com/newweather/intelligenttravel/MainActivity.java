@@ -1,7 +1,6 @@
 package com.newweather.intelligenttravel;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
         TimeButton.setOnClickListener(v -> mTimePickerDialog.showDateAndTimePickerDialog());
 
         QueryButton.setOnClickListener(v-> {
+<<<<<<< HEAD
             Intent intent=new Intent(MainActivity.this,SecondActivity.class);
             startActivity(intent);
             WaitDialog.showProgressDialog(MainActivity.this);
@@ -146,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 //            }
 //
 //
+=======
+>>>>>>> a030104e0aa8bbfa0549caa6df2dbe2fa2d7fd89
             WaitDialog.showProgressDialog(MainActivity.this);
             String StartCity = pref.getString("ScCity", "");
             String EndCity = pref.getString("EcCity", "");
