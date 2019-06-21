@@ -111,39 +111,33 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
         TimeButton.setOnClickListener(v -> mTimePickerDialog.showDateAndTimePickerDialog());
 
         QueryButton.setOnClickListener(v-> {
-<<<<<<< HEAD
             Intent intent=new Intent(MainActivity.this,SecondActivity.class);
             startActivity(intent);
-//            WaitDialog.showProgressDialog(MainActivity.this);
-//            String StartCity = pref.getString("ScCity", "");
-//            String EndCity = pref.getString("EcCity", "");
-//            String Date = pref.getString("date", "");   //格式为：xxxx-xx-xx  如：2019-01-23
-//            String Time = pref.getString("time", "");   //格式为: xx;xx     如：04:45
-//            if(StartCity.equals("")||EndCity.equals("")||Date.equals("")||Time.equals("")){
-//                Toast.makeText(MainActivity.this,"Please Choose All!!!",Toast.LENGTH_SHORT).show();
-//            }else{
-//                PlanUtil planUtil = new PlanUtil();
-//                Log.d(TAG, "onCreate:  kkk it has start");
-//
-//                myHandler = new Handler() {
-//                    @Override
-//                    public void handleMessage(Message msg) {
-//                        if (msg.what == 1) {
-//                            super.handleMessage(msg);
-//                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
-//                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
-//                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
-//                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
-//                            WaitDialog.dismiss();
-//                        } else if (msg.what == 2) {
-//                            super.handleMessage(msg);
-//                            trueSubway = AnotherGet.getsubwayy();//获取trueSubway实例
-//                            // totalduration即公共交通总时间
-//                            Log.d(TAG, "handleMessage: kkk sub " + trueSubway.getTotalduration());
-//                        }
-//                    }
-//                };
-//                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
+            WaitDialog.showProgressDialog(MainActivity.this);
+            String StartCity = pref.getString("ScCity", "");
+            String EndCity = pref.getString("EcCity", "");
+            String Date = pref.getString("date", "");   //格式为：xxxx-xx-xx  如：2019-01-23
+            String Time = pref.getString("time", "");   //格式为: xx;xx     如：04:45
+            if(StartCity.equals("")||EndCity.equals("")||Date.equals("")||Time.equals("")){
+                Toast.makeText(MainActivity.this,"Please Choose All!!!",Toast.LENGTH_SHORT).show();
+            }else{
+                PlanUtil planUtil = new PlanUtil();
+                Log.d(TAG, "onCreate:  kkk it has start");
+
+                myHandler = new Handler() {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        if (msg.what == 1) {
+                            super.handleMessage(msg);
+                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
+                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
+                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
+                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
+                            WaitDialog.dismiss();
+                        }
+                    }
+                };
+                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
 //            、、、、、、
                 //SomeUtil.GetLaL(myHandler,"乐山");
                 //参数实例
@@ -152,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 //            }
 //
 //
-=======
             WaitDialog.showProgressDialog(MainActivity.this);
             String StartCity = pref.getString("ScCity", "");
             String EndCity = pref.getString("EcCity", "");
@@ -192,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 //            AnotherGet.getSubway(myHandler, "杭州", "杭州", "萧山国际机场", "杭州站");
             }
 //120.443341,30.240638 xiao 120.189606,30.249207 hang
->>>>>>> c967ee51052c3d5979d9d7a004f75083b2169d91
         });
     }
 
