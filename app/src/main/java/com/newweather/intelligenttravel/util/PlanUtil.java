@@ -54,6 +54,7 @@ public class PlanUtil {
     public void GetPlan(Handler mHandler, String StartCity, String EndCity, String Date, String Time){
         getPlaneMap();
         @SuppressLint("HandlerLeak") Handler Ahandler = new Handler(){
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -68,7 +69,7 @@ public class PlanUtil {
                     fare_train.get(0).setChoose_flag(0);
                     provinceList = LitePal.findAll(Province.class);
 //        AllTrain(mHandler,StartCity,EndCity,Date,Time);
-//                    for(int i=0;i<1;i++){
+//                    for(int i=0;i<100;i++){
 //                        AllFlight(StartCity,EndCity,Date,Time);
 //                    }
                     TrainToFlight(mHandler,StartCity,EndCity,Date,Time);
@@ -86,7 +87,7 @@ public class PlanUtil {
 //        这里传入的Handler也是没用用的
         Handler unuseHandler = new Handler();
         Flight flight = FlightUtil.GetFlight(CodeMap,unuseHandler,StartCity, EndCity, Date, SomeUtil.AddTime(Time,"01:30"));
-        if(flight.getStartTime()!=null){
+        if(flight!=null&&flight.getStartStation()!=null){
             String useTime = SomeUtil.getTime(flight.getEndTime(),flight.getStartTime());
             if(useTime.equals("false")){
                 useTime = SomeUtil.getTime(SomeUtil.AddTime(flight.getEndTime(),"24:00"),flight.getStartTime());
@@ -297,6 +298,7 @@ public class PlanUtil {
 //                                      获取地铁的时间
                                             AnotherGet.GetSubway(subHandler[0],city.getCityName(), train.get(train.size() - 1)
                                                     .railway.arrival_stop.arrival_name, AirportMap.get(city.getCityName()));
+                                            Log.d(TAG, "handleMessage: kkkadw + " + train.get(train.size()-1).railway.arrival_stop.arrival_name);
                                         }
                                     }
                                     if(msg.what == 3){
@@ -319,28 +321,62 @@ public class PlanUtil {
      */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void FlightToTrain(Context context, Handler mHandler, String StartCity, String EndCity, String Date, String Time){
-        for(Province province:provinceList){
-            cityList = LitePal.where("provinceId = ?",String.valueOf(province.getId())).find(City.class);
+        if(AirportMap.get(StartCity)!=null){
+            for(Province province:provinceList){
+                cityList = LitePal.where("provinceId = ?",String.valueOf(province.getId())).find(City.class);
 //            遍历所有城市，找出所有情况
-            for(City city:cityList){
-                if(!(city.getCityName().equals(StartCity)||city.getCityName().equals(EndCity))){
+                for(City city:cityList){
+                    if(isPlane(StartCity,city.getCityName())){
+                        if(!(city.getCityName().equals(StartCity)||city.getCityName().equals(EndCity))){
 //                    这里传入Handler是没有用的，想办法让他没用
-                    Handler unuseHandler = new Handler();
-                    Flight flight = FlightUtil.GetFlight(CodeMap,unuseHandler,StartCity,city.getCityName(),Date,Time);
-                    if(flight!=null){
+                            Handler unuseHandler = new Handler();
+                            //由于flightUtil使用的是callable，所以会阻塞主线程等其返回值，所以不需要用handler来通知
+                            Flight flight = FlightUtil.GetFlight(CodeMap,unuseHandler,StartCity,city.getCityName(),Date,Time);
+                            if(flight!=null){
 //                        获取火车的实例
-                        @SuppressLint("HandlerLeak") Handler FlightTrainHandler = new Handler(){
-                            @Override
-                            public void handleMessage(Message msg) {
-                                super.handleMessage(msg);
-                                if(msg.what == 1){
-                                    TrueTrain train = AnotherGet.gettrain();
+                                @SuppressLint("HandlerLeak") Handler FlightTrainHandler = new Handler(){
+                                    @Override
+                                    public void handleMessage(Message msg) {
+                                        super.handleMessage(msg);
+                                        if(msg.what == 1){
+                                            //因为通过坐标来获取，所以可以直接得到所有的公交时间，就不同单独再去获取了
+                                            Bundle trainbundle = msg.getData();
 //                                    String useTime = SomeUtil.getTime(train.getArrivaltime(),Time);
-                                    String fare = flight.getFare();
-                                }
+                                            ArrayList<Segments> train = trainbundle.getParcelableArrayList("train");
+                                            if(train!=null){
+                                                String trainusetime = train.get(0).usetime;
+                                                String flightusetime= SomeUtil.getTime(flight.getEndTime(),flight.getStartTime());
+                                                String usetime = SomeUtil.AddTime(trainusetime,flightusetime);
+                                                Float fare = Float.parseFloat(flight.getFare())+Float.parseFloat(train.get(0).cost);
+                                                if(SomeUtil.getTime(usetime,use_time_min).equals("false")){
+                                                    Log.d(TAG, "handleMessage: kkk train flight usetime = " + usetime);
+                                                    Log.d(TAG, "handleMessage: kkk train flight usetime_min = " + use_time_min);
+                                                    use_time_min = usetime;
+                                                    train.get(0).setChoose_flag(1);
+                                                    train.get(0).setOrder_flag(1);
+                                                    flight.setChoose_flag(1);
+                                                    flight.setOrder_flag(2);
+                                                    time_train = train;
+                                                    time_flight = flight;
+                                                }
+                                                if(fare<Float.parseFloat(fare_min)){
+                                                    Log.d(TAG, "handleMessage: kkk train flight fare = " + fare);
+                                                    Log.d(TAG, "handleMessage: kkk train flight fare_min = " + fare_min);
+                                                    fare_min = String.valueOf(fare);
+                                                    train.get(0).setChoose_flag(1);
+                                                    train.get(0).setOrder_flag(1);
+                                                    flight.setChoose_flag(1);
+                                                    flight.setOrder_flag(2);
+                                                    fare_train = train;
+                                                    fare_flight = flight;
+                                                }
+                                            }
+                                        }
+                                    }
+                                };
+                                AnotherGet.getTrain(LalMap,FlightTrainHandler,city.getCityName(),EndCity,Date,flight.getEndTime());
                             }
-                        };
-                        AnotherGet.getTrain(LalMap,FlightTrainHandler,city.getCityName(),EndCity,Date,flight.getEndTime());
+                        }
                     }
                 }
             }

@@ -68,11 +68,10 @@ public class FlightUtil {
         }
         if(StartCode!=null&&EndCode!=null){
             final int[] flag = {0};
-            ExecutorService executor = Executors.newFixedThreadPool(10);
+            ExecutorService executor = Executors.newFixedThreadPool(50);
             FutureTask<Flight> future = new FutureTask<>(() -> {
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 final int[] times = {0};
-//            查看是否进行这里，以及这里与外面的差距
                 final Flight flight = new Flight();
 //                while (flag[0] ==0){
                     times[0]++;
@@ -198,7 +197,15 @@ public class FlightUtil {
                                             }
                                         }
                                         Log.d(TAG, "GetFlight: kkk   成功获取 ： " + flight.getStartStation());
-                                        //Log.d(TAG, "call: kkk000000");
+                                        Bundle bundle = new Bundle();
+                                        bundle.putSerializable("flight",flight);
+                                        Log.d(TAG, "GetFlight: kkk bundle?");
+                                        Message message = new Message();
+                                        message.what = 1;
+                                        message.setData(bundle);
+                                        Log.d(TAG, "GetFlight: kkk message?");
+                                        flightHandler.sendMessage(message);
+                                        Log.d(TAG, "call: kkk000000");
                                         break;
                                     }
                                 } catch (ParseException e) {
@@ -275,12 +282,12 @@ public class FlightUtil {
             }
             if(flight.getStartStation()!=null){
                 Log.d(TAG, "GetFlight: ???");
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("flight",flight);
-                Message message = new Message();
-                message.what = 1;
-                message.setData(bundle);
-                flightHandler.sendMessage(message);
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable("flight",flight);
+//                Message message = new Message();
+//                message.what = 1;
+//                message.setData(bundle);
+//                flightHandler.sendMessage(message);
             }
             oneflight = flight;
             return flight;
@@ -314,7 +321,6 @@ public class FlightUtil {
                 try {
                     doc = Jsoup.connect("http://airport.anseo.cn/search/?q=" + CityName).get();
                     els = doc.select("td");
-                    Log.d(TAG, "call: kkkels = " + els.text());
                     String[] spString = els.text().split("\\s+");
                     Code[0] = spString[7];
                 } catch (IOException e) {

@@ -739,7 +739,7 @@ public class SomeUtil {
     public static void GetLaL(Handler LaLHandler, final String startCity, final String endCity){
         String startLaL = "http://api.map.baidu.com/geocoder/v2/?address=" + startCity+"&output=json&ak=DwmOFEfx3wu9uRHK5iRkP21Yoj7jrDvI";
         String endLaL = "http://api.map.baidu.com/geocoder/v2/?address="+endCity+"&output=json&ak=DwmOFEfx3wu9uRHK5iRkP21Yoj7jrDvI";
-//        Log.d(TAG, "GetLaL: kkk Lal = " + startLaL);
+        Log.d(TAG, "GetLaL: kkk Lal = " + startLaL);
 //        内存中没有时才访问网络，有的话就直接读取
         HttpUtil.sendOkHttpRequest(startLaL, new Callback() {
             @Override

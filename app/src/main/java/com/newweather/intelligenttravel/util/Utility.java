@@ -38,6 +38,7 @@ public class Utility {
         try{
             String cost;
             String duration;
+            //response已经是获取到的内容了
             JSONObject jsonObject=new JSONObject(response);
             JSONObject jsonObject1=jsonObject.getJSONObject("route");
             JSONArray jsonArray=jsonObject1.getJSONArray("transits");
@@ -129,6 +130,7 @@ public class Utility {
     public static int handleSubwayRouteResponse(String response){
         int subwaytime = 0;
         try{
+            Log.d(TAG, "handleProvinceResponse: kkk utility xiancheng = " + Thread.currentThread().getName());
             JSONObject jsonObject=new JSONObject(response);
             JSONObject jsonObject1=jsonObject.getJSONObject("route");
             JSONArray jsonArray=jsonObject1.getJSONArray("transits");
