@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.newweather.intelligenttravel.Entity.Flight;
 import com.newweather.intelligenttravel.Entity.Segments;
+import com.newweather.intelligenttravel.util.SomeUtil;
 
 import org.w3c.dom.Text;
 
@@ -27,7 +28,7 @@ public class SecondActivity extends AppCompatActivity {
     private LinearLayout luxianf11Layout;
     private LinearLayout luxianLayout;
     private LinearLayout luxianf12Layout;
-gm
+
     private TextView chufadi2;
     private TextView mudidi2;
     private TextView zonghaoshi2;
@@ -45,10 +46,11 @@ gm
         Intent intent=this.getIntent();
         //根据bundle中的key值获取数据
         //接收对象
-        Flight time_flight = intent.getSerializableExtra("key");
-        Flight fare_flight = flight;
-        List<Segments> time_train = null;
-        List<Segments> fare_train = null;
+        Bundle extras=getIntent().getExtras();
+        Flight time_flight = extras.getParcelable("time_flight");
+        Flight fare_flight = extras.getParcelable("fare_flight");
+        List<Segments> time_train = extras.getParcelableArrayList("time_train");
+        List<Segments> fare_train = extras.getParcelableArrayList("fare_train");
 
         //初始化各控件
         secondActivityLayout=(ScrollView)findViewById(R.id.secondactivity_layout);
@@ -68,26 +70,77 @@ gm
         luxianf21Layout=(LinearLayout)findViewById(R.id.luxianf21_layout2);
         luxianLayout2=(LinearLayout)findViewById(R.id.luxian_layout2);
         luxianf22Layout=(LinearLayout)findViewById(R.id.luxianf22_layout2);
-        Flight flight=new Flight();
-        flight.setChoose_flag(1);
-        flight.setOrder_flag(1);
-        flight.setStartStation("杭州站");
-        flight.setEndStation("太原站");
-        flight.setStartTime("4:00");
-        flight.setEndTime("8:00");
-        flight.setFare("4000元");
 
         //出发，到达城市
         //计算总耗时，总费用
-        String zonghaoshitext = "12hour";//最短时间
-        String zongfeiyongtext = "500yuan";
-        String zonghaoshi2text="19hour";//最少费用
-        String zongfeiyong2text="400yuan";
+        String flighttime=null;//时间
+        String traintime=null;
+        String zonghaoshitext=null;
+        Float zongfeiyongtext=null;
+        String chufaditext=null;
+        String mudiditext=null;
 
-        chufadi.setText("杭州");
-        mudidi.setText("太原");
+        String flighttime2=null;//费用
+        String traintime2=null;
+        String zonghaoshitext2=null;
+        Float zongfeiyongtext2=null;
+        String chufaditext2=null;
+        String mudiditext2=null;
+
+        //最短时间
+        if(time_flight.getChoose_flag()==1&&time_train.get(0).getChoose_flag()==1){
+            flighttime = SomeUtil.getTime(time_flight.getEndTime(),time_flight.getStartTime());
+            traintime = time_train.get(0).usetime;
+            zonghaoshitext = SomeUtil.AddTime(flighttime,traintime);
+            zongfeiyongtext = Float.parseFloat(time_flight.getFare())+Float.parseFloat(time_train.get(0).cost);
+            if(time_flight.getOrder_flag()==1){
+                chufaditext=time_flight.getStartStation();
+                mudiditext=time_train.get(time_train.size()-1).railway.arrival_stop.arrival_name;
+            }else{
+                chufaditext=time_train.get(0).railway.departure_stop.departure_name;
+                mudiditext=time_flight.getEndStation();
+            }
+        }else if(time_flight.getChoose_flag()==1&&time_train.get(0).getChoose_flag()==0){
+            chufaditext=time_flight.getStartStation();
+            mudiditext=time_flight.getEndStation();
+            zonghaoshitext=SomeUtil.getTime(time_flight.getEndTime(),time_flight.getStartTime());
+            zongfeiyongtext=Float.valueOf(time_flight.getFare());
+        }else if(time_flight.getChoose_flag()==0&&time_train.get(0).getChoose_flag()==1){
+            chufaditext=time_train.get(0).railway.departure_stop.departure_name;
+            mudiditext=time_train.get(time_train.size()-1).railway.arrival_stop.arrival_name;
+            zonghaoshitext=time_train.get(0).usetime;
+            zongfeiyongtext=Float.valueOf(time_train.get(0).cost);
+        }
+
+        //最少费用
+        if(fare_flight.getChoose_flag()==1&&fare_train.get(0).getChoose_flag()==1){
+            flighttime2 = SomeUtil.getTime(fare_flight.getEndTime(),fare_flight.getStartTime());
+            traintime2 = fare_train.get(0).usetime;
+            zonghaoshitext2 = SomeUtil.AddTime(flighttime2,traintime2);
+            zongfeiyongtext2 = Float.parseFloat(fare_flight.getFare())+Float.parseFloat(fare_train.get(0).cost);
+            if(fare_flight.getOrder_flag()==1){
+                chufaditext2=fare_flight.getStartStation();
+                mudiditext2=fare_train.get(fare_train.size()-1).railway.arrival_stop.arrival_name;
+            }else{
+                chufaditext2=fare_train.get(0).railway.departure_stop.departure_name;
+                mudiditext2=fare_flight.getEndStation();
+            }
+        }else if(fare_flight.getChoose_flag()==1&&fare_train.get(0).getChoose_flag()==0){
+            chufaditext2=fare_flight.getStartStation();
+            mudiditext2=fare_flight.getEndStation();
+            zonghaoshitext2=SomeUtil.getTime(fare_flight.getEndTime(),time_flight.getStartTime());
+            zongfeiyongtext2=Float.valueOf(fare_flight.getFare());
+        }else if(fare_flight.getChoose_flag()==0&&fare_train.get(0).getChoose_flag()==1){
+            chufaditext2=fare_train.get(0).railway.departure_stop.departure_name;
+            mudiditext2=fare_train.get(fare_train.size()-1).railway.arrival_stop.arrival_name;
+            zonghaoshitext2=fare_train.get(0).usetime;
+            zongfeiyongtext2=Float.valueOf(fare_train.get(0).cost);
+        }
+
+        chufadi.setText(chufaditext);
+        mudidi.setText(mudiditext);
         zonghaoshi.setText(zonghaoshitext);
-        zongfeiyong.setText(zongfeiyongtext);
+        zongfeiyong.setText(String.valueOf(zongfeiyongtext));
         //最短时间路线
         luxianf11Layout.removeAllViews();
         if(time_flight.getOrder_flag()==0&&time_flight.getChoose_flag()==1){
@@ -97,11 +150,11 @@ gm
             TextView starttime=(TextView)view.findViewById(R.id.starttime);
             TextView endtime=(TextView)view.findViewById(R.id.endtime);
             TextView feiyong=(TextView)view.findViewById(R.id.feiyong);
-            chufazhan.setText(flight.getStartStation());
-            mudizhan.setText(flight.getEndStation());
-            starttime.setText(flight.getEndTime());
-            endtime.setText(flight.getEndTime());
-            feiyong.setText(flight.getFare());
+            chufazhan.setText(time_flight.getStartStation());
+            mudizhan.setText(time_flight.getEndStation());
+            starttime.setText(time_flight.getEndTime());
+            endtime.setText(time_flight.getEndTime());
+            feiyong.setText(time_flight.getFare());
             luxianf11Layout.addView(view);
 
         }
@@ -131,20 +184,20 @@ gm
             TextView starttime=(TextView)view.findViewById(R.id.starttime);
             TextView endtime=(TextView)view.findViewById(R.id.endtime);
             TextView feiyong=(TextView)view.findViewById(R.id.feiyong);
-            chufazhan.setText(flight.getStartStation());
-            mudizhan.setText(flight.getEndStation());
-            starttime.setText(flight.getEndTime());
-            endtime.setText(flight.getEndTime());
-            feiyong.setText(flight.getFare());
+            chufazhan.setText(time_flight.getStartStation());
+            mudizhan.setText(time_flight.getEndStation());
+            starttime.setText(time_flight.getEndTime());
+            endtime.setText(time_flight.getEndTime());
+            feiyong.setText(time_flight.getFare());
             luxianf12Layout.addView(view);
         }
 
         //最少费用路线
-        chufadi2.setText("杭州");
-        mudidi2.setText("太原");
-        zonghaoshi2.setText(zonghaoshi2text);
-        zongfeiyong2.setText(zongfeiyong2text);
-        //最短时间路线
+        chufadi2.setText(chufaditext2);
+        mudidi2.setText(mudiditext2);
+        zonghaoshi2.setText(zonghaoshitext2);
+        zongfeiyong2.setText(String.valueOf(zongfeiyongtext2));
+
         luxianf21Layout.removeAllViews();
         if(fare_flight.getOrder_flag()==0&&fare_flight.getChoose_flag()==1){
             View view=LayoutInflater.from(this).inflate(R.layout.luxian_item,luxianf21Layout,false);
@@ -153,11 +206,11 @@ gm
             TextView starttime=(TextView)view.findViewById(R.id.starttime);
             TextView endtime=(TextView)view.findViewById(R.id.endtime);
             TextView feiyong=(TextView)view.findViewById(R.id.feiyong);
-            chufazhan.setText(flight.getStartStation());
-            mudizhan.setText(flight.getEndStation());
-            starttime.setText(flight.getEndTime());
-            endtime.setText(flight.getEndTime());
-            feiyong.setText(flight.getFare());
+            chufazhan.setText(fare_flight.getStartStation());
+            mudizhan.setText(fare_flight.getEndStation());
+            starttime.setText(fare_flight.getEndTime());
+            endtime.setText(fare_flight.getEndTime());
+            feiyong.setText(fare_flight.getFare());
             luxianf21Layout.addView(view);
         }
         if(fare_train.get(0).getChoose_flag()==1){
@@ -186,11 +239,11 @@ gm
             TextView starttime=(TextView)view.findViewById(R.id.starttime);
             TextView endtime=(TextView)view.findViewById(R.id.endtime);
             TextView feiyong=(TextView)view.findViewById(R.id.feiyong);
-            chufazhan.setText(flight.getStartStation());
-            mudizhan.setText(flight.getEndStation());
-            starttime.setText(flight.getEndTime());
-            endtime.setText(flight.getEndTime());
-            feiyong.setText(flight.getFare());
+            chufazhan.setText(fare_flight.getStartStation());
+            mudizhan.setText(fare_flight.getEndStation());
+            starttime.setText(fare_flight.getEndTime());
+            endtime.setText(fare_flight.getEndTime());
+            feiyong.setText(fare_flight.getFare());
             luxianf22Layout.addView(view);
         }
     }

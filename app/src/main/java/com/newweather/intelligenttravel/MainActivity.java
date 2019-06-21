@@ -1,7 +1,9 @@
 package com.newweather.intelligenttravel;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.newweather.intelligenttravel.Entity.Flight;
+import com.newweather.intelligenttravel.Entity.Segments;
 import com.newweather.intelligenttravel.Entity.TrueSubway;
 import com.newweather.intelligenttravel.Entity.TrueTrain;
 import com.newweather.intelligenttravel.util.FlightUtil;
@@ -33,6 +36,8 @@ import com.newweather.intelligenttravel.util.WaitDialog;
 import java.security.PublicKey;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements TimePickerDialogUtil.TimePickerDialogInterface {
 
@@ -109,44 +114,44 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
         TimeButton.setOnClickListener(v -> mTimePickerDialog.showDateAndTimePickerDialog());
 
         QueryButton.setOnClickListener(v-> {
-<<<<<<< HEAD
-            Intent intent=new Intent(MainActivity.this,SecondActivity.class);
-            startActivity(intent);
-            WaitDialog.showProgressDialog(MainActivity.this);
-            String StartCity = pref.getString("ScCity", "");
-            String EndCity = pref.getString("EcCity", "");
-            String Date = pref.getString("date", "");   //格式为：xxxx-xx-xx  如：2019-01-23
-            String Time = pref.getString("time", "");   //格式为: xx;xx     如：04:45
-            if(StartCity.equals("")||EndCity.equals("")||Date.equals("")||Time.equals("")){
-                Toast.makeText(MainActivity.this,"Please Choose All!!!",Toast.LENGTH_SHORT).show();
-            }else{
-                PlanUtil planUtil = new PlanUtil();
-                Log.d(TAG, "onCreate:  kkk it has start");
-
-                myHandler = new Handler() {
-                    @Override
-                    public void handleMessage(Message msg) {
-                        if (msg.what == 1) {
-                            super.handleMessage(msg);
-                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
-                            WaitDialog.dismiss();
-                        }
-                    }
-                };
-                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
-//            、、、、、、
-                //SomeUtil.GetLaL(myHandler,"乐山");
-                //参数实例
-//            AnotherGet.getTrain(myHandler, "杭州", "北京", "2019-6-13", "8:00");
-//            AnotherGet.getSubway(myHandler, "杭州", "杭州", "西溪竞舟苑", "杭州汽车北站");
-//            }
+//<<<<<<< HEAD
+//            Intent intent=new Intent(MainActivity.this,SecondActivity.class);
+//            startActivity(intent);
+//            WaitDialog.showProgressDialog(MainActivity.this);
+//            String StartCity = pref.getString("ScCity", "");
+//            String EndCity = pref.getString("EcCity", "");
+//            String Date = pref.getString("date", "");   //格式为：xxxx-xx-xx  如：2019-01-23
+//            String Time = pref.getString("time", "");   //格式为: xx;xx     如：04:45
+//            if(StartCity.equals("")||EndCity.equals("")||Date.equals("")||Time.equals("")){
+//                Toast.makeText(MainActivity.this,"Please Choose All!!!",Toast.LENGTH_SHORT).show();
+//            }else{
+//                PlanUtil planUtil = new PlanUtil();
+//                Log.d(TAG, "onCreate:  kkk it has start");
 //
-//
-=======
->>>>>>> a030104e0aa8bbfa0549caa6df2dbe2fa2d7fd89
+//                myHandler = new Handler() {
+//                    @Override
+//                    public void handleMessage(Message msg) {
+//                        if (msg.what == 1) {
+//                            super.handleMessage(msg);
+//                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
+//                            WaitDialog.dismiss();
+//                        }
+//                    }
+//                };
+//                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
+////            、、、、、、
+//                //SomeUtil.GetLaL(myHandler,"乐山");
+//                //参数实例
+////            AnotherGet.getTrain(myHandler, "杭州", "北京", "2019-6-13", "8:00");
+////            AnotherGet.getSubway(myHandler, "杭州", "杭州", "西溪竞舟苑", "杭州汽车北站");
+////            }
+////
+////
+//=======
+//>>>>>>> a030104e0aa8bbfa0549caa6df2dbe2fa2d7fd89
             WaitDialog.showProgressDialog(MainActivity.this);
             String StartCity = pref.getString("ScCity", "");
             String EndCity = pref.getString("EcCity", "");
@@ -171,10 +176,18 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
                         }
                         if(i[0]==1&&j[0]==1){
                             super.handleMessage(msg);
-                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
-//                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
-//                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
-//                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
+                            Flight time_flight = planUtil.getTime_flight();
+                            Flight fare_flight = planUtil.getFare_flight();
+                            List<Segments> time_train = planUtil.getTime_train();
+                            List<Segments> fare_train = planUtil.getFare_train();
+                            Intent intent=new Intent(MainActivity.this,SecondActivity.class);
+                            Bundle bundle=new Bundle();
+                            bundle.putParcelable("time_flight", (Parcelable) time_flight);
+                            bundle.putParcelable("fare_flight", (Parcelable) fare_flight);
+                            bundle.putParcelableArrayList("time_train", (ArrayList<? extends Parcelable>) time_train);
+                            bundle.putParcelableArrayList("fare_train", (ArrayList<? extends Parcelable>) fare_train);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
                             WaitDialog.dismiss();
                         }
                     }
@@ -186,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
 //            AnotherGet.getSubway(myHandler, "杭州", "杭州", "萧山国际机场", "杭州站");
             }
 //120.443341,30.240638 xiao 120.189606,30.249207 hang
+
         });
     }
 

@@ -138,6 +138,7 @@ public class PlanUtil {
                             use_time_min = usetime;
                             train.get(0).setChoose_flag(1);
                             time_flight.setChoose_flag(0);
+                            time_flight.setOrder_flag(0);
                             train.get(0).setOrder_flag(1);
                             time_train = train;
                         }
@@ -147,6 +148,7 @@ public class PlanUtil {
                             fare_min = fare;
                             train.get(0).setChoose_flag(1);
                             fare_flight.setChoose_flag(0);
+                            fare_flight.setOrder_flag(0);
                             train.get(0).setOrder_flag(1);
                             fare_train = train;
                         }
