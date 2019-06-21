@@ -1,6 +1,7 @@
 package com.newweather.intelligenttravel;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,42 +110,46 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
         TimeButton.setOnClickListener(v -> mTimePickerDialog.showDateAndTimePickerDialog());
 
         QueryButton.setOnClickListener(v-> {
-            WaitDialog.showProgressDialog(MainActivity.this);
-            String StartCity = pref.getString("ScCity", "");
-            String EndCity = pref.getString("EcCity", "");
-            String Date = pref.getString("date", "");   //格式为：xxxx-xx-xx  如：2019-01-23
-            String Time = pref.getString("time", "");   //格式为: xx;xx     如：04:45
-            if(StartCity.equals("")||EndCity.equals("")||Date.equals("")||Time.equals("")){
-                Toast.makeText(MainActivity.this,"Please Choose All!!!",Toast.LENGTH_SHORT).show();
-            }else{
-                PlanUtil planUtil = new PlanUtil();
-                Log.d(TAG, "onCreate:  kkk it has start");
-
-                myHandler = new Handler() {
-                    @Override
-                    public void handleMessage(Message msg) {
-                        if (msg.what == 1) {
-                            super.handleMessage(msg);
-                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
-                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
-                            WaitDialog.dismiss();
-                        } else if (msg.what == 2) {
-                            super.handleMessage(msg);
-                            trueSubway = AnotherGet.getsubwayy();//获取trueSubway实例
-                            // totalduration即公共交通总时间
-                            Log.d(TAG, "handleMessage: kkk sub " + trueSubway.getTotalduration());
-                        }
-                    }
-                };
-                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
+            Intent intent=new Intent(MainActivity.this,SecondActivity.class);
+            startActivity(intent);
+//            WaitDialog.showProgressDialog(MainActivity.this);
+//            String StartCity = pref.getString("ScCity", "");
+//            String EndCity = pref.getString("EcCity", "");
+//            String Date = pref.getString("date", "");   //格式为：xxxx-xx-xx  如：2019-01-23
+//            String Time = pref.getString("time", "");   //格式为: xx;xx     如：04:45
+//            if(StartCity.equals("")||EndCity.equals("")||Date.equals("")||Time.equals("")){
+//                Toast.makeText(MainActivity.this,"Please Choose All!!!",Toast.LENGTH_SHORT).show();
+//            }else{
+//                PlanUtil planUtil = new PlanUtil();
+//                Log.d(TAG, "onCreate:  kkk it has start");
+//
+//                myHandler = new Handler() {
+//                    @Override
+//                    public void handleMessage(Message msg) {
+//                        if (msg.what == 1) {
+//                            super.handleMessage(msg);
+//                            Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
+//                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
+//                            WaitDialog.dismiss();
+//                        } else if (msg.what == 2) {
+//                            super.handleMessage(msg);
+//                            trueSubway = AnotherGet.getsubwayy();//获取trueSubway实例
+//                            // totalduration即公共交通总时间
+//                            Log.d(TAG, "handleMessage: kkk sub " + trueSubway.getTotalduration());
+//                        }
+//                    }
+//                };
+//                planUtil.GetPlan(MainActivity.this, myHandler,StartCity,EndCity,Date,Time);
+//            、、、、、、
                 //SomeUtil.GetLaL(myHandler,"乐山");
                 //参数实例
 //            AnotherGet.getTrain(myHandler, "杭州", "北京", "2019-6-13", "8:00");
 //            AnotherGet.getSubway(myHandler, "杭州", "杭州", "西溪竞舟苑", "杭州汽车北站");
-            }
-
+//            }
+//
+//
         });
     }
 

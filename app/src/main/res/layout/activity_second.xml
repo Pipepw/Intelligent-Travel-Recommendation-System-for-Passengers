@@ -3,11 +3,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="15dp"
     >
     <ScrollView
-        android:id="@+id/SecondActivity_layout"
+        android:id="@+id/secondactivity_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="8dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -26,61 +28,88 @@
                     android:textSize="20sp"
                     android:gravity="center"/>
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="出发地："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/chufadi"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="目的地："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/mudidi"
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="wrap_content"
+                                android:text="出发地："
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:id="@+id/chufadi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="wrap_content"
+                                android:text="目的地："
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:id="@+id/mudidi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"/>
+                        </LinearLayout>
+
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="总耗时："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/zonghaoshi"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="总费用："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/zongfeiyong"
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="wrap_content"
+                                android:text="总耗时："
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:id="@+id/zonghaoshi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="wrap_content"
+                                android:text="总费用："
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:id="@+id/zongfeiyong"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"/>
+                        </LinearLayout>
+
+
+
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -95,11 +124,25 @@
                         android:textSize="18sp"
                         android:gravity="center"/>
                     <LinearLayout
-                        android:id="@+id/lucheng_layout"
+                        android:id="@+id/luxianf11_layout"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        //动态加载布局：luxian_item.xml flight
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/luxian_layout"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         //动态加载布局：luxian_item.xml
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/luxianf12_layout"
+                        android:orientation="vertical"
+                        android:layout_width= "match_parent"
+                        android:layout_height="wrap_content">
+                        //动态加载布局：luxian_item.xml  flight
                     </LinearLayout>
 
                 </LinearLayout>
@@ -116,62 +159,89 @@
                     android:textSize="20sp"
                     android:gravity="center"/>
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="出发地："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/chufadi2"
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="目的地："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/mudidi2"
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="wrap_content"
+                                android:text="出发地："
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:id="@+id/chufadi2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"/>
+                        </LinearLayout>
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
+                            android:layout_weight="1">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="wrap_content"
+                                android:text="目的地："
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:id="@+id/mudidi2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"/>
+                        </LinearLayout>
+
+
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="总费用："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/zongfeiyong2"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:layout_width="90dp"
-                            android:layout_height="wrap_content"
-                            android:text="总耗时："
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/zonghaoshi2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="18sp"/>
+                            android:layout_weight="1">
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1">
+                                <TextView
+                                    android:layout_width="75dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="总费用："
+                                    android:textSize="18sp"/>
+                                <TextView
+                                    android:id="@+id/zongfeiyong2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="15sp"/>
+                            </LinearLayout>
 
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1">
+                                <TextView
+                                    android:layout_width="75dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="总耗时："
+                                    android:textSize="18sp"/>
+                                <TextView
+                                    android:id="@+id/zonghaoshi2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="15sp"/>
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -186,7 +256,21 @@
                         android:textSize="18sp"
                         android:gravity="center"/>
                     <LinearLayout
-                        android:id="@+id/lucheng_layout2"
+                        android:id="@+id/luxianf21_layout2"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        //动态加载布局：luxian_item.xml
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/luxian_layout2"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        //动态加载布局：luxian_item.xml
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/luxianf22_layout2"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
