@@ -27,7 +27,7 @@ public class SecondActivity extends AppCompatActivity {
     private LinearLayout luxianf11Layout;
     private LinearLayout luxianLayout;
     private LinearLayout luxianf12Layout;
-
+gm
     private TextView chufadi2;
     private TextView mudidi2;
     private TextView zonghaoshi2;
