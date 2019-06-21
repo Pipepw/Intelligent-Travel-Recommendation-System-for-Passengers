@@ -120,24 +120,24 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialogU
                 PlanUtil planUtil = new PlanUtil();
                 Log.d(TAG, "onCreate:  kkk it has start");
                 final int[] i = {0};
+                final int[] j = {0};
 
                 myHandler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
                         if (msg.what == 1) {
+                            i[0] = 1;
+                        }
+                        if (msg.what == 2) {
+                            j[0] = 1;
+                        }
+                        if(i[0]==1&&j[0]==1){
                             super.handleMessage(msg);
-                            i[0]++;
-                            Log.d(TAG, "handleMessage:  kkk main i = " + i[0]);
                             Log.d(TAG, "onCreate: kkk flight choose_flag? + " + planUtil.getFare_flight().getChoose_flag());
 //                            Log.d(TAG, "onCreate: kkk flight order_flag? + " + planUtil.getTime_flight().getChoose_flag());
 //                            Log.d(TAG, "onCreate: kkk train choose_flag? + " + planUtil.getFare_train().get(0).getChoose_flag());
 //                            Log.d(TAG, "onCreate: kkk train order_flag? + " + planUtil.getTime_train().get(0).getChoose_flag());
                             WaitDialog.dismiss();
-                        } else if (msg.what == 2) {
-                            super.handleMessage(msg);
-                            String time = AnotherGet.GetSubwayTime();//获取trueSubway实例
-                            // totalduration即公共交通总时间
-                            Log.d(TAG, "handleMessage: kkk sub " + time);
                         }
                     }
                 };

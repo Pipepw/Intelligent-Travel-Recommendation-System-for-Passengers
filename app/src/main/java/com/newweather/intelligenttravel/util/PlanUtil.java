@@ -68,10 +68,8 @@ public class PlanUtil {
                     fare_train.get(0).setOrder_flag(0);
                     fare_train.get(0).setChoose_flag(0);
                     provinceList = LitePal.findAll(Province.class);
-//        AllTrain(mHandler,StartCity,EndCity,Date,Time);
-//                    for(int i=0;i<100;i++){
-//                        AllFlight(StartCity,EndCity,Date,Time);
-//                    }
+                    AllTrain(mHandler,StartCity,EndCity,Date,Time);
+                    AllFlight(StartCity,EndCity,Date,Time);
                     TrainToFlight(mHandler,StartCity,EndCity,Date,Time);
                 }
             }
@@ -329,9 +327,19 @@ public class PlanUtil {
                     if(isPlane(StartCity,city.getCityName())){
                         if(!(city.getCityName().equals(StartCity)||city.getCityName().equals(EndCity))){
 //                    这里传入Handler是没有用的，想办法让他没用
-                            Handler unuseHandler = new Handler();
+                            @SuppressLint("HandlerLeak") Handler flightHandler = new Handler(){
+                                @Override
+                                public void handleMessage(Message msg) {
+                                    super.handleMessage(msg);
+                                    if(msg.what==2){
+                                        Message message = new Message();
+                                        message.what = 2;
+                                        mHandler.sendMessage(message);
+                                    }
+                                }
+                            };
                             //由于flightUtil使用的是callable，所以会阻塞主线程等其返回值，所以不需要用handler来通知
-                            Flight flight = FlightUtil.GetFlight(CodeMap,unuseHandler,StartCity,city.getCityName(),Date,Time);
+                            Flight flight = FlightUtil.GetFlight(CodeMap,flightHandler,StartCity,city.getCityName(),Date,Time);
                             if(flight!=null){
 //                        获取火车的实例
                                 @SuppressLint("HandlerLeak") Handler FlightTrainHandler = new Handler(){
